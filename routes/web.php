@@ -11,6 +11,13 @@
 |
 */
 
+Route::get('/aboutus', 'PageController@getAboutUs');
+Route::get('/contactus', 'PageController@getContactUs');
+
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
