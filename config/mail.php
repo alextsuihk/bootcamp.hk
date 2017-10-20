@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'admin_email' => env('ADMIN_EMAIL', 'admin@bootcamp.hk'),
+    'error_email' => env('ERROR_EMAIL', 'error@bootcamp.hk'),
+    'info_email' => env('INFO_EMAIL', 'info@bootcamp.hk'),
 
     /*
     |--------------------------------------------------------------------------

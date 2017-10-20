@@ -5,13 +5,13 @@
     </button>
 
     <div id="logo">
-        <a class="navbar-brand" href="/"><img src="/images/logo.png" alt="laravel logo"></a>
+        <a class="navbar-brand" href="/"><img src="/img/logo.png" alt="laravel logo"></a>
     </div>
 
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/workshops">Workshops</a>
@@ -24,23 +24,24 @@
                 <div class="dropdown-menu" aria-labelledby="dropdown_aboutus">
                     <a class="dropdown-item" href="#">Industry</a>
                     <a class="dropdown-item" href="#">Students</a>
-                    <a class="dropdown-item" href="#">Freelance</a>
+                    <a class="dropdown-item" href="#">Freelancer</a>
                 </div>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="dropdown_aboutus" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About Us</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown_aboutus">
-                    <a class="dropdown-item" href="#">About Us</a>
-                    <a class="dropdown-item" href="#">Contact Us</a>
-                    <a class="dropdown-item" href="#">Sponsor Venue</a>
+                    <a class="dropdown-item" href="/aboutus">About Us</a>
+                    <a class="dropdown-item" href="/contactus">Contact Us</a>
+                    <a class="dropdown-item" href="/aboutus#SponsorVenue">Venue Support</a>
                     <a class="dropdown-item" href="#">Consultant Services</a>
                 </div>
             </li>
         </ul>
 
-
+        {{-- AT-Pending: make search box expandable --}}
         {{-- https://stackoverflow.com/questions/34124050/how-to-expand-input-field-to-the-right-in-a-header-bar --}}
         <form action="#" class="form-inline">
+            {{ csrf_field() }}
             <input class="form-control " type="text" id="keyword" name="keyword" placeholder="Search... (make it expandable)" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Search</button>
         </form>

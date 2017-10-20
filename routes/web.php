@@ -11,12 +11,18 @@
 |
 */
 
-Route::get('/aboutus', 'PageController@getAboutUs');
-Route::get('/contactus', 'PageController@getContactUs');
+Route::get('aboutus', 'PageController@getAboutUs');
+Route::get('contactus', 'PageController@getContactUs');
+
+Route::resource('workshops', 'WorkshopController', ['only' =>[
+    'index','create','store','show','edit','update'
+]]);
+
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('workshops');
 });
+
 
 Auth::routes();
 

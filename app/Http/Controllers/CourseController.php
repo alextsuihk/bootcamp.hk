@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Workshop;
+use App\Coruse;
 use App\Level;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Requests\StoreUpdateWorkshop;
+use App\Http\Requests\StoreUpdateCourse;
 
-class WorkshopController extends Controller
+class CourseController extends Controller
 {
     public function __construct()
     {
@@ -23,15 +23,15 @@ class WorkshopController extends Controller
      */
     public function index()
     {
-/*        $workshops = Cache::remember('WorkshopAllSortByNumber', 5, function() {
-            return Workshop::all()->sortBy('number');             
+/*        $courses = Cache::remember('CourseAllSortByNumber', 5, function() {
+            return Course::all()->sortBy('number');             
         });*/
                                             // only caching for read-only (index & show)
-        $workshops = Cache::remember('WorkshopWithLevelSortByNumber', 5, function() {
-            return Workshop::with('level')->get()->sortBy('number');
+        $courses = Cache::remember('CourseWithLevelSortByNumber', 5, function() {
+            return Course::with('level')->get()->sortBy('number');
         });                     // turn on eager loading
 
-        return view('workshops.index', compact('workshops'));
+        return view('courses.index', compact('courses'));
     }
 
     /**
@@ -44,7 +44,7 @@ class WorkshopController extends Controller
         $levels = Level::getAllLevel();
         $edit = null;                   // because the same form is shared for "create" & "edit" 
                                         // we also add a custom helper in \app\Helpers\Helper.php 
-        return view('workshops.create', compact(['levels', 'edit']));
+        return view('courses.create', compact(['levels', 'edit']));
     }
 
     /**
@@ -54,23 +54,23 @@ class WorkshopController extends Controller
      * @return \Illuminate\Http\Response
      */
     //public function store(Request $request)
-    public function store(StoreUpdateWorkshop $request) // use type-hints Requests & do rule validatio
+    public function store(StoreUpdateCourse $request) // use type-hints Requests & do rule validatio
     {
-        //Workshop::create(request(['number', 'title', 'abstract', 'level_id', 'is_active']) );
+        //Course::create(request(['number', 'title', 'abstract', 'level_id', 'is_active']) );
         // stupid bootstrap returns "on" for checkbox, cannot use mass assignment
 
-        $workshop = Workshop::create([ 
-            'number' => request('number'),
+        $course = Course::create([ 
+            'number' => rCourseequest('number'),
             'title' => request('title'),
             'abstract' => request('abstract'),
             'level_id' => request('level_id'),
             'is_active' => ($request->is_active ? true : false ),
         ]);
 
-        session()->flash('message','A new workshop is added');
+        session()->flash('message','A new course is added');
         
-        //return redirect('/workshops/'.$workshop->id);     // let do it is Laravel way
-        return redirect()->route('workshops.show', [$workshop->number]);
+        //return redirect('/courses/'.$course->id);     // let do it is Laravel way
+        return redirect()->route('courses.show', [$course->number]);
     }
 
     /**
@@ -81,29 +81,26 @@ class WorkshopController extends Controller
     public function show_old($id)
     {
         // AT-Pending: pending refactoring
-        // only cache & eager loading Workshop & Lession
+        // only cache & eager loading Course & Lession
         // user enrollment will be using lazy loading
-        $key = 'Workshop_'.$id;         
-        $workshop = Cache::remember($key, 5, function() use ($id) {
-            return Workshop::with(['level','lessons'])->find($id);
+        $key = 'Course'.$id;         
+        $course = Cache::remember($key, 5, function() use ($id) {
+            return Course::with(['level','lessons'])->find($id);
         });                                 // turn on eager loading
-        dd($workshop);
-        return view('workshops.show', compact('workshop'));
+        dd($course);
+        return view('courses.show', compact('course'));
     }
 
-    public function show($number)           
-                                // we fool the system, we are search by number (workshop number)
+    public function show($number)
     {
-
         // AT-Pending: pending refactoring
-        // only cache & eager loading Workshop & Lession
+        // only cache & eager loading Course & Lession
         // user enrollment will be using lazy loading
-        
-        $key = 'Workshop_'.$number;         
-        $workshop = Cache::remember($key, 5, function() use ($number) {
-            return Workshop::with(['level','lessons'])->where('number', '=', $number)->first();
+        $key = 'Course'.$number;         
+        $course = Cache::remember($key, 5, function() use ($number) {
+            return Course::with(['level','lessons'])->where('number', '=', $number)->first();
         });                                 // turn on eager loading
-        return view('workshops.show', compact('workshop'));
+        return view('courses.show', compact('course'));
     }
 
     /**
@@ -112,12 +109,12 @@ class WorkshopController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($number)
     {
-        $edit = Workshop::find($id);        // pull original data
+        $edit = Course::where('number', '=', $number)->first();        // pull original data
         $levels = Level::getAllLevel();
         
-        return view('workshops.edit', compact(['edit', 'levels']));
+        return view('courses.edit', compact(['edit', 'levels']));
     }
 
     /**
@@ -128,22 +125,22 @@ class WorkshopController extends Controller
      * @return \Illuminate\Http\Response
      */
     //public function update(Request $request, $id)
-    public function update(StoreUpdateWorkshop $request, $id)   // type-hinted & do rule validation
+    public function update(StoreUpdateCourse $request, $id)   // type-hinted & do rule validation
     {
-        $workshop = Workshop::find($id);    // pull original data
+        $course = Course::find($id);    // pull original data
 
-        $workshop->number = $request->number;
-        $workshop->title = $request->title;
-        $workshop->abstract = $request->abstract;
-        $workshop->level_id = $request->level_id;
-        $workshop->is_active = ($request->is_active ? true : false );
+        $course->number = $request->number;
+        $course->title = $request->title;
+        $course->abstract = $request->abstract;
+        $course->level_id = $request->level_id;
+        $course->is_active = ($request->is_active ? true : false );
 
-        $workshop->save();
+        $course->save();
 
-        session()->flash('message','Workshop detail is updated');
-        // flush cache 'Workshop_'.$id
+        session()->flash('message','Course detail is updated');
+        // flush cache 'Course_'.$id
 
-        return redirect()->route('workshops.show', $workshop->number);
+        return redirect()->route('courses.show', $course->number);
     }
 
     /**
