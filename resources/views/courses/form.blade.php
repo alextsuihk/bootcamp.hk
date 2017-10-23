@@ -34,7 +34,7 @@
     </div>
 
     <div class="form-group">
-        <div class="checkbox">
+        <div class="checkbox-inline">
             <label>
                 <input type="checkbox" name="is_active" {{ Helper::old('is_active', $edit) ? 'checked' : '' }}> Active (course will be visible to usesr) </label>
         </div>
@@ -43,7 +43,7 @@
     <div class="form-group">
         <button type="submit" class="btn btn-primary">{{ $button }}</button>
 
-        <a class="btn btn-secondary" href="{{ route('workshops.index') }}">Cancel</a>
+        <a class="btn btn-secondary" href="{{ route('courses.index') }}">Cancel</a>
     </div>
 
 </form>

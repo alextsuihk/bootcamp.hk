@@ -14,13 +14,18 @@
 Route::get('aboutus', 'PageController@getAboutUs');
 Route::get('contactus', 'PageController@getContactUs');
 
-Route::resource('workshops', 'WorkshopController', ['only' =>[
+/*Route::resource('courses', 'CourseController', ['only' =>[
     'index','create','store','show','edit','update'
+]]);*/
+
+Route::resource('courses', 'CourseController', ['only' =>[
+    'index','create','store', 'edit','update'
 ]]);
+Route::get('courses/{course}/{slug?}', 'CourseController@show')->name('courses.show');
 
 
 Route::get('/', function () {
-    return redirect('workshops');
+    return redirect('courses');
 });
 
 

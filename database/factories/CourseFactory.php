@@ -3,11 +3,11 @@
 use Faker\Generator as Faker;
 use Carbon\Carbon;
 
-$factory->define(App\Workshop::class, function (Faker $faker) {
+$factory->define(App\Course::class, function (Faker $faker) {
     return [
         'title' => substr($faker->sentence(5, true), 0, 50),
         //'number' => $faker->randomDigit,
-        'number' => rand(101, 399),
+        'number' => rand(101, 299),
         'abstract' => $faker->paragraph,
         //'level' => $faker->randomElement(['Beginner', 'Intermediate', 'Advanced']),
         'level_id' => rand(21,23),

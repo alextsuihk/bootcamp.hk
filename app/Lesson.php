@@ -6,8 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lesson extends Model
 {
-    public function workshop()
+
+    /**
+     * Get Course from Lesson
+     *
+     * @return mixed
+     */
+    public function course()
     {
-        return $this->belongsTo(Workshop::class);
+        return $this->belongsTo(Course::class);
     }
 }

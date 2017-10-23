@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Cache;
 
 class Level extends Model
 {
+    /**
+     * Get all Difficulty Level info from datadata & cache
+     *
+     * @return object
+     */
     public static function getAllLevel()
     {
         $levels = Cache::remember('LevelAll', 60, function() {
@@ -16,8 +21,13 @@ class Level extends Model
         return $levels;
     }
 
-    public function workshops()
+    /**
+     * Get Courses from Level
+     *
+     * @return object
+     */
+    public function courses()
     {
-        return $this->hasMany(Workshop::class);
+        return $this->hasMany(Course::class);
     }
 }
