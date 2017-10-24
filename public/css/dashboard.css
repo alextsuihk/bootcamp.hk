@@ -86,3 +86,18 @@ h1 {
 a.btn.btn-primary.nav-btn {
     margin-left: 10px;
 }
+
+.form-label {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.form-help {
+  font-size: 0.85em;
+  color:grey;
+}
+
+.form-error {
+  font-size: 0.9em;
+  color:red;
+}

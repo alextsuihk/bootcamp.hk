@@ -16,6 +16,7 @@
                 </nav>
 
                 <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
+                    @include ('partials.impersonate')
                     @include ('partials.message')
                     @yield ('content')
                     @include ('partials.footer')

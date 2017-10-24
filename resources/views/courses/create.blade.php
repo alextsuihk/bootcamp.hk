@@ -2,13 +2,19 @@
 
 @section ('title', 'Adding Course')
 
+@php
+    $edit = null;       // shared-form could display original values (which is null in this case)
+@endphp
+
 @section ('content')
     <h2>Add a Course</h2>
     <hr>
     @include ('courses.form', [ 
-        'action'=> '/courses', 
-        'method'=> '', 
-        'button'=>'Submit',
+        'type'     => 'create',
+        'disabled' => '',           // don't disable form-input
+        'action'   => '/courses', 
+        'method'   => '', 
+        'button'   =>'Submit',
         ]) 
 @endsection
 

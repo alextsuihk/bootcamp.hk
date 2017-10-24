@@ -61,10 +61,17 @@
             @else
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="dropdown_login" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ Auth::user()->name }} <span class="caret"></span></a>
-                    <div class="dropdown-menu" aria-labelledby="dropdown_login">
-                        <a class="dropdown-item" href="#">Profile</a>
+                        @if (strlen(Auth::user()->nickname) == 0)
+                            {{ Auth::user()->name }} 
+                        @else
+                            {{ Auth::user()->nickname }}
+                        @endif
+                        <span class="caret"></span></a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown_login">
                         <a class="dropdown-item disabled" href="#">My Class</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/profile">Profile</a>
+                        <a class="dropdown-item" href="/password/change">Change Password</a>
                         <div class="dropdown-divider"></div>  
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
@@ -74,26 +81,6 @@
                         </form>
                     </div>
                 </li>
-
-{{-- AT-Pending: to be deleted --}}
-{{--                 <li class="navbar-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        {{ Auth::user()->name }} <span class="caret"></span>
-                    </a>
-
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#">Profile</a>
-                        <a class="dropdown-item disabled" href="#">My Classes</a>            
-                        <div class="dropdown-divider"></div>           
-                        <a class="dropdown-item" href="{{ route('logout') }}"
-                            onclick="event.preventDefault();
-                                     document.getElementById('logout-form').submit();">Logout</a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            {{ csrf_field() }}
-                        </form>
-                    </div>
-                </li> --}}
-
             @endguest
         </ul>
 

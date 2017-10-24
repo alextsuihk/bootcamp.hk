@@ -12,8 +12,7 @@ class CourseController extends Controller
 {
     public function __construct()
     {
-        // AT-Pending: enable admin middleware
-//        $this->middleware('admin')->except(['index', 'show']);   // except index & show, other methods need auth()
+        $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
     }
 
     /**
@@ -21,24 +20,10 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index_old()
-    {
-/*        $courses = Cache::remember('CourseAllSortByNumber', 5, function() {
-            return Course::all()->sortBy('number');             
-        });*/
-                                            // only caching for read-only (index & show)
-        $courses = Cache::remember('CourseWithLevelSortByNumber', 5, function() {
-            return Course::with('level')->get()->sortBy('number');
-        });                     // turn on eager loading
-
-        $keywords = 'Search... (placeholder)';                  // index & search use the same view
-        return view('courses.index', compact(['courses', 'keywords']));
-    }
-
     public function index(Request $request)
     {
-        if ($request->has('keywords')) {
-            $keywords = $request->input('keywords');        // get query string
+        if ($request->has('keywords') 
+            && !is_null($keywords = $request->input('keywords'))) { // get query string
             $courses = Course::with('level')->SearchByKeywords($keywords)->get()->sortBy('number');
 
         } else {
@@ -59,9 +44,7 @@ class CourseController extends Controller
     public function create()
     {
         $levels = Level::getAllLevel();
-        $edit = null;                   // because the same form is shared for "create" & "edit" 
-                                        // we also add a custom helper in \app\Helpers\Helper.php 
-        return view('courses.create', compact(['levels', 'edit']));
+        return view('courses.create', compact(['levels']));
     }
 
     /**
@@ -86,7 +69,7 @@ class CourseController extends Controller
 
         session()->flash('message','A new course is added');
         
-        //return redirect('/courses/'.$course->id);     // let do it is Laravel way
+        //return redirect('/courses/'.$course->id);     // let do it in Laravel way
         return redirect()->route('courses.show', [$course->number]);
     }
 
@@ -95,32 +78,6 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show_old($id)
-    {
-        // AT-Pending: pending refactoring
-        // only cache & eager loading Course & Lession
-        // user enrollment will be using lazy loading
-        $key = 'Course'.$id;         
-        $course = Cache::remember($key, 5, function() use ($id) {
-            return Course::with(['level','lessons'])->find($id);
-        });                                 // turn on eager loading
-        dd($course);
-        return view('courses.show', compact('course'));
-    }
-
-    public function show_old2($number)
-    {
-        // AT-Pending: pending refactoring
-        // only cache & eager loading Course & Lession
-        // user enrollment will be using lazy loading
-        $key = 'Course'.$number;         
-        $course = Cache::remember($key, 5, function() use ($number) {
-            return Course::with(['level','lessons'])->where('number', '=', $number)->first();
-        });                                 // turn on eager loading
-        return view('courses.show', compact('course'));
-    }
-
-
     public function show($number, $slug = null)
     {
         // AT-Pending: pending refactoring
@@ -131,11 +88,20 @@ class CourseController extends Controller
             return Course::with(['level','lessons'])->where('number', '=', $number)->first();
         });                                 // enable eager loading + cache
 
+        if (empty($course))
+        {
+            session()->flash('messageAlertType','alert-warning');
+            session()->flash('message','Course '.$number.' is not found');
+            return redirect()->route('courses.index');
+
+        }
+
         if (!($slug))
         {
             $slug = str_slug($course->title);
             $url = '/courses/'.$number.'/'.$slug;
-            header("Location: $url");
+            request()->session()->reflash();         // flush again before redirect, otherwise message is lost
+            return redirect($url); 
         }
 
         return view('courses.show', compact('course'));
@@ -174,11 +140,11 @@ class CourseController extends Controller
 
         $course->save();
 
-        session()->flash('message','Course detail is updated');
-        Cache::forget('Course'.$id);                        // flush this key in cache
+        Cache::forget('Course'.$course->number);                        // flush this key in cache
 
-        //return redirect()->route('courses.show', $course->number);
-        return redirect()->action('CourseController@show', ['course' => $course->number]);
+        session()->flash('message','Course detail is updated');
+        return redirect()->route('courses.show', $course->number);
+        //return redirect()->action('CourseController@show', ['course' => $course->number]);
     }
 
     /**

@@ -1,6 +1,7 @@
 {{-- AT-Pending: show warning if being impersonates  --}}
 @if ($flash = session('message'))
-    @if (!($alertType = session('messageAlertType')))
+    @if (!($alertType = session('messageAlertType')) 
+    || !in_array($alertType, ['alert-primary', 'alert-secondary', 'alert-success', 'alert-danger', 'alert-warning', 'alert-info', 'alert-light', 'alert-dark']) )
         @php
             $alertType = 'alert-info';
         @endphp

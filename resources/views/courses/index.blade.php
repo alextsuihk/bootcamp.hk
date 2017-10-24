@@ -14,9 +14,14 @@
         </form>
     </span>
 
-    <span class="float-right">
-        <a class="btn btn-primary" href="/courses/create">Add Course</a>
-    </span>
+    @auth 
+        @if (auth()->user()->admin)
+            <span class="float-right">
+                <a class="btn btn-primary" href="/courses/create">Add Course</a>
+            </span>
+        @endif
+    @endauth
+    
     <br><br>
 
     @if (count($courses) == 0)
@@ -32,7 +37,11 @@
                         <th>Title</th>
                         <th>Level</th>
                         <th>Detail</th>
-                        <th>Admin</th>
+                        @auth 
+                            @if (auth()->user()->is_admin)
+                                <th>Edit</th>
+                            @endif
+                        @endauth
                     </tr>
                 </thead>
                 <tbody>
@@ -43,10 +52,12 @@
                             <td><strong>{{ str_limit($course->title, 40, ' ...') }} </strong></td>
                             <td>{{ $course->level->difficulty }}</td>
                             <td><a class="btn btn-primary" href="/courses/{{ $course->number }}">View</a></td>
-                            <td>
-                                <a class="btn btn-primary" href="/courses/{{ $course->number }}/edit">Edit</a>
-                                {{-- <a class="btn btn-primary disabled" href="/courses/{{ $course->number }}">Classes</a> --}}
-                            </td>
+                            @auth 
+                                @if (auth()->user()->admin)
+                                <td><a class="btn btn-primary" href="/courses/{{ $course->number }}/edit">Edit</a></td>
+                                @endif
+                            @endauth
+                            
                         </tr>
                     @endforeach
                 </tbody>
