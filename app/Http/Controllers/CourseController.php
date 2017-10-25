@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Course;
-use App\Level;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\CourseStoreUpdate;
+use App\Course;
+use App\Level;
+use App\Lesson;
+use App\Teachinglanguage;
 
 class CourseController extends Controller
 {
@@ -22,7 +24,7 @@ class CourseController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->has('keywords') 
+        if ($request->has('keywords')           // query-string has "keywords"
             && !is_null($keywords = $request->input('keywords'))) { // get query string
             $courses = Course::with('level')->SearchByKeywords($keywords)->get()->sortBy('number');
 
@@ -104,7 +106,9 @@ class CourseController extends Controller
             return redirect($url); 
         }
 
-        return view('courses.show', compact('course'));
+        $lessons = $course->lessons->sortbyDesc('first_day');       // sortBy first_day DESC
+
+        return view('courses.show', compact(['course', 'lessons']));
     }
     /**
      * Show the form for editing the specified resource.
@@ -132,7 +136,7 @@ class CourseController extends Controller
     {
         $course = Course::find($id);    // pull original data, id does not change, must reference id
         
-        $course->number = $request->number;
+        /*$course->number = $request->number;*/         // unchangeable
         $course->title = $request->title;
         $course->abstract = $request->abstract;
         $course->level_id = $request->level_id;

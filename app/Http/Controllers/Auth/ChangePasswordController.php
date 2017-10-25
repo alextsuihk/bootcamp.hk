@@ -56,7 +56,7 @@ class ChangePasswordController extends Controller
         // return either validtion fail or original password is wrong
         if ($validator->fails() || $wrongPassword) 
         {
-            return redirect('/password/change')
+            return redirect()->back()
                         /*->withErrors($validator)*/
                         ->withErrors($newMsgBag)
                         ->withInput();

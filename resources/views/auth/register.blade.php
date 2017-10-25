@@ -5,7 +5,6 @@
 @section('content')
     <h2>Registration Page</h2>
     <hr>
-    {{-- @include ('partials.errors') --}}
 
     <form class="form-horizontal" method="POST" action="{{ route('register') }}">
         {{ csrf_field() }}

@@ -26,9 +26,9 @@ class CourseStoreUpdate extends FormRequest
     {
         return [
             //'number' => 'required|integer|between:100,999|unique:courses',
-            'number' => 'required|integer|between:100,999',
+            'number' => 'sometimes|required|integer|between:100,999|unique:courses',
             'title' => 'required|max:50',
-            'abstract' => 'required',
+            'abstract' => 'required|min:20',
             'level_id' => 'required|integer',
             'is_active' => 'sometimes',
         ];

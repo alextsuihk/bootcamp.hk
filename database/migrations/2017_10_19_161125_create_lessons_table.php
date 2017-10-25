@@ -15,11 +15,14 @@ class CreateLessonsTable extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('number', 6);
-            $table->integer('course_id')->unsigned(); 
+            //$table->string('number', 6)->comment(' "course_number"."-"."sequence"');
+            $table->integer('course_id')->unsigned()->index(); 
             $table->foreign('course_id')->references('id')->on('courses');
-            $table->integer('instance')->comment('increment when a new lesson is created with the same course');
+            $table->integer('sequence')->unsigned()->index()->comment('increment when a new lesson is created with the same course');
+            $table->boolean('enrollable')->default(false);
             $table->string('instructor')->nullable();
+            $table->integer('language_id')->unsigned()->index(); 
+            $table->foreign('language_id')->references('id')->on('teaching_languages');
             $table->string('venue')->nullable();
             $table->date('first_day')->nullable();
             $table->date('last_day')->nullable();
