@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class Teachinglanguage extends Model
+class TeachingLanguage extends Model
 {
     /**
      * Get all Teaching Language info from datadata & cache
@@ -28,6 +28,6 @@ class Teachinglanguage extends Model
      */
     public function lesson()
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->hasMany(Lesson::class);
     }
 }

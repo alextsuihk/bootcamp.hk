@@ -1,6 +1,7 @@
 <?php 
 
 namespace App\Helpers;
+use Illuminate\Support\Facades\Auth;
 
 class Helper
 {
@@ -21,6 +22,23 @@ class Helper
             $value= $edit->$key;
         }
         return $value;
+    }
+
+    /**
+     * Check if user is logged && admin
+     *
+     * @param  none
+     * @return boolean
+     */
+    public static function admin()
+    {
+        if (Auth::check() && auth()->user()->admin)
+        {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 }
 

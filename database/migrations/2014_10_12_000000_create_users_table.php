@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->datetime('email_token_created_at')->default('2000-01-01 00:00:00');
             $table->string('email_verified')->default(false);
             $table->string('password');
+            $table->boolean('disabled')->default(false);
             $table->rememberToken();
             $table->string('facebook_id')->index()->nullable();
             $table->string('google_id')->index()->nullable();

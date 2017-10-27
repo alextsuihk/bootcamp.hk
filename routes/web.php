@@ -14,9 +14,11 @@
 /**
  * Static Pages Controller
  */
-Route::get('aboutus', 'PageController@getAboutUs');
-Route::get('contactus', 'PageController@getContactUs');
-
+/*Route::get('aboutus', 'PageController@getAboutUs');
+Route::get('contactus', 'PageController@getContactUs');*/
+//AT-Pending: go ahead & remove PageController
+Route::view('aboutus', 'pages/aboutus');
+Route::view('contactus', 'pages/contactus');
 /**
  * Courses Controller
  */
@@ -28,6 +30,15 @@ Route::resource('courses', 'CourseController', ['only' =>[
 ]]);
 Route::get('courses/{course}/{slug?}', 'CourseController@show')->name('courses.show');
 
+/**
+ * Lesson Controller
+ */
+Route::post('lessons/{id}/enroll', 'LessonController@enroll')->name('lesson.enroll');
+Route::post('lessons/{id}/cancel', 'LessonController@cancel')->name('lesson.cancel');
+Route::get('lessons/create/{course_id}', 'LessonController@create')->name('lesson.create');
+Route::post('lessons/', 'LessonController@store')->name('lesson.store');
+Route::get('lessons/{id}/edit', 'LessonController@edit')->name('lesson.edit');
+Route::patch('lessons/{id}', 'LessonController@update')->name('lesson.update');
 
 /**
  * User Profile
@@ -38,16 +49,17 @@ Route::post('profile/{id?}', 'ProfileController@update');
 Route::get('email/verify/{token}', 'ProfileController@emailverify')->name('email.verify');
 Route::get('password/change', 'Auth\ChangePasswordController@edit');
 Route::post('password/change', 'Auth\ChangePasswordController@update');
+//Route::get('')
 Auth::routes();
 
 /*Route::get('admin/users', 'Admin\PageController@getContactUs');
 */
 
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return redirect('courses');
 })->name('home');
-
-
+*/
+Route::redirect('/', 'courses')->name('home');            // redirect "/" to "/courses"
 
 Route::get('/home', 'HomeController@index')->name('home-old');

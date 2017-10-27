@@ -18,17 +18,19 @@ class CreateLessonsTable extends Migration
             //$table->string('number', 6)->comment(' "course_number"."-"."sequence"');
             $table->integer('course_id')->unsigned()->index(); 
             $table->foreign('course_id')->references('id')->on('courses');
-            $table->integer('sequence')->unsigned()->index()->comment('increment when a new lesson is created with the same course');
-            $table->boolean('enrollable')->default(false);
-            $table->string('instructor')->nullable();
-            $table->integer('language_id')->unsigned()->index(); 
-            $table->foreign('language_id')->references('id')->on('teaching_languages');
+            $table->integer('sequence')->unsigned()->default(0)->index()->comment('increment when a new lesson is created with the same course');
             $table->string('venue')->nullable();
+            $table->string('instructor')->nullable();
+            $table->integer('teaching_language_id')->unsigned()->index(); 
+            $table->foreign('teaching_language_id')->references('id')->on('teaching_languages');
             $table->date('first_day')->nullable();
             $table->date('last_day')->nullable();
-            $table->string('schedule')->comment('Every Mon 6~8pm');
+            $table->string('schedule')->nullable()->comment('Every Mon 6~8pm');
+            $table->boolean('active')->default(false);
+            $table->boolean('deleted')->default(false);
             //$table->string('gitlab_uri')->nullable();
-            $table->integer('quota')->unsigned()->default(0);
+            $table->integer('quota')->nullable()->unsigned();
+            $table->text('remark')->nullable();
             $table->timestamps();
         });
     }

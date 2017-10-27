@@ -9,7 +9,7 @@
 @section ('content')
     <h2>Add a Course</h2>
     <hr>
-    @include ('courses.course_form', [ 
+    @include ('courses.form', [ 
         'type'     => 'create',
         'disabled' => '',               // don't disable form-input
         'course_num_readonly' => '',    // course_num is not changeable AFTER creation

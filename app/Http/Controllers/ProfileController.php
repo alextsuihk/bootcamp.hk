@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Validator;
-use Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Helpers\Helper;
 use App\User;
 use App\Mail\VerifyEmail;
-use Mail;
+
 
 class ProfileController extends Controller
 {
@@ -25,7 +27,7 @@ class ProfileController extends Controller
      */
     public function sendemailverify($id = 0)
     {
-        if (!(auth()->user()->admin) || !(request()->session()->has('impersonate')))
+        if (!(Helper::admin()) || !(request()->session()->has('impersonate')))
         {                           // if not admin, fallback to login user id
             $id = Auth::id();
         } 
@@ -102,7 +104,7 @@ class ProfileController extends Controller
      */
     public function edit($id = 0)
     {
-        if (!(auth()->user()->admin) || !(request()->session()->has('impersonate')))
+        if (!(Helper::admin()) || !(request()->session()->has('impersonate')))
         {                           // if not admin, fallback to login user id
             $id = Auth::id();
         } 
@@ -125,7 +127,7 @@ class ProfileController extends Controller
             'mobile'   => 'nullable|digits:8|unique:users',
         ]);
 
-        if (!(auth()->user()->admin) || !(request()->session()->has('impersonate')))
+        if (!(Helper::admin()) || !(request()->session()->has('impersonate')))
         {                           // if not admin, fallback to login user id
             $id = Auth::id();
         } 

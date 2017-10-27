@@ -6,7 +6,7 @@ show My_Question: no of unread answered
  --}}
 
 @auth
-    @if (auth()->user()->admin)
+    @if (Helper::admin())
         <ul class="nav nav-pills flex-column">
             <li class="nav-item">
                 <span class="nav-link"><strong>Admin</strong></span>

@@ -1,18 +1,24 @@
 @extends ('layouts.master')
 
-@section ('title', 'Course Detail')
+@section ('title', 'Add Lesson')
 
 @php
     $edit = $course;       // when showing, pass in $course as $edit (old original data)
 @endphp
 
 @section ('content')
+    <script type="text/javascript">             // AT-Pending: scrollIntoView not working
+        $(document).ready(function() {
+            document.getElementById('lessonSection').scrollIntoView();
+        }
+    </script>
+
     <div class="row">
         <span class="mr-auto"><h2>Course Detail</h2></span>
         <span class="ml-auto mr-5">
             <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
             <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
-            @if (Helper::admin())
+            @if (Auth::check() && auth()->user()->admin)
                 <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="/courses/{{ $course->number }}/edit">
                     <img src="/img/edit.png" alt="Edit"></a>
             @endif
@@ -28,26 +34,19 @@
         'button'   => '',
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
-
-    <div class="row">
-        <span class="mr-auto">
-            <h3 id="lessonList">Class Offerings</h3>
-        </span>
-        @auth 
-            @if (Helper::admin())
-                <span class="ml-auto mr-5">
-                    <a class="btn btn-primary" href="/lessons/create/{{ $course->id }}">Add Lesson</a>
-                </span>
-            @endif
-        @endauth
-    </div>
-
+                            
     @include ('lessons.list')
+    
+    <hr>
+    
+    <h3 id="lessonSection">Adding a Lesson</h3>
+    @include ('lessons.form', [ 
+        'type'     => 'create',
+        'disabled' => '',               // don't disable form-input
+        'action'   => '/lessons/', 
+        'method'   => '', 
+        'button'   =>'Submit',
+        'previousUrl' => url()->previous(),
+        ]) 
 
 @endsection
-
-{{-- <script type="text/javascript">    // no need to include, popper.js already included in layouts/master.blade.php
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-</script> --}}

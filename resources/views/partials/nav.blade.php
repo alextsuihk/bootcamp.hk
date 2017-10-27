@@ -19,14 +19,14 @@
             <li class="nav-item">
                 <a class="nav-link" href="#">Questions</a>
             </li>
-            <li class="nav-item dropdown">
+{{--             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="dropdown_interns" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Interns</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown_interns">
                     <a class="dropdown-item" href="#">Industry</a>
-                    <a class="dropdown-item" href="#">Students</a>
-                    <a class="dropdown-item" href="#">Freelancer</a>
+                    <a class="dropdown-item" href="#">Student</a>
+                    <a class="dropdown-item" href="#">Freelance</a>
                 </div>
-            </li>
+            </li> --}}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="dropdown_aboutus" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About Us</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown_aboutus">

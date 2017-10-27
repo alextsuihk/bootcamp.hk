@@ -8,7 +8,6 @@ use App\Http\Requests\CourseStoreUpdate;
 use App\Course;
 use App\Level;
 use App\Lesson;
-use App\Teachinglanguage;
 
 class CourseController extends Controller
 {
@@ -30,7 +29,7 @@ class CourseController extends Controller
 
         } else {
                                      // only caching for read-only (index & show)
-            $courses = Cache::remember('CourseWithLevelSortByNumber', 5, function() {
+            $courses = Cache::tags(['courses'])->remember('CourseWithLevelSortByNumber', 5, function() {
                 return Course::with('level')->get()->sortBy('number');
             });                     // turn on eager loading
             $keywords = 'Search... (placeholder)';                  // index & search use the same view
@@ -62,13 +61,15 @@ class CourseController extends Controller
         //Course::create(request(['number', 'title', 'abstract', 'level_id', 'is_active']) );
         // stupid bootstrap returns "on" for checkbox, cannot use mass assignment
         $course = Course::create([ 
-            'number' => sprintf("%03d", request('number')),
-            'title' => request('title'),
-            'abstract' => request('abstract'),
-            'level_id' => request('level_id'),
+            'number' => sprintf("%03d", $request->number),
+            'title' => $request->title,
+            'abstract' => $request->abstract,
+            'level_id' => $request->level_id,
             'is_active' => ($request->is_active ? true : false ),
+            'remark' => $request->remark,
         ]);
 
+        Cache::tags('courses')->flush();                    // flush 'courses' cache (no need to wait to expire)
         session()->flash('message','A new course is added');
         
         //return redirect('/courses/'.$course->id);     // let do it in Laravel way
@@ -82,14 +83,14 @@ class CourseController extends Controller
      */
     public function show($number, $slug = null)
     {
-        // AT-Pending: pending refactoring
         // only cache & eager loading Course & Lession
         // user enrollment will be using lazy loading
         $key = 'Course'.$number;         
-        $course = Cache::remember($key, 5, function() use ($number) {
-            return Course::with(['level','lessons'])->where('number', '=', $number)->first();
+        $course = Cache::tags(['courses', 'lessons'])->remember($key, 5, function() use ($number) {
+            return Course::with(['level','lessons', 'lessons.teaching_language', 'lessons.users'])->where('number', '=', $number)->where('deleted', false )->first();
         });                                 // enable eager loading + cache
 
+        //dd($course);                      // Alex: just to make sure super nested eager loading has happend
         if (empty($course))
         {
             session()->flash('messageAlertType','alert-warning');
@@ -141,6 +142,7 @@ class CourseController extends Controller
         $course->abstract = $request->abstract;
         $course->level_id = $request->level_id;
         $course->is_active = ($request->is_active ? true : false );
+        $course->remark =  $request->remark;
 
         $course->save();
 

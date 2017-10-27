@@ -3,9 +3,11 @@
     {{ $method }}       {{-- needed in case of update [PATCH] which is not supported by most browsers today --}}
                         {{-- we also add a custom helper in \app\Helpers\Helper.php  --}}
 
+{{-- AT-Pending: no need to pass course->id,we are using course-number as reference
+    <input type="hidden" name="course_id" value="{{ $course->id }}" /> --}}
     <div class="form-group">
         <label class="col-form-label form-label" for="title">Course Number:</label>
-        <input type="number" class="form-control" id="number" name="number" 
+        <input type="number" class="col-1 form-control" id="number" name="number" 
         value="{{ Helper::old('number', $edit) }}" placeholder="101" 
         required {{ $disabled }} {{ $course_num_readonly }}>
         @if ($type != 'show')
@@ -77,7 +79,7 @@
         <div class="checkbox-inline">
             <label>
                 <input type="checkbox" name="is_active" {{ Helper::old('is_active', $edit) ? 'checked' : '' }} 
-                {{ $disabled }}> Active for Enrollment </label>
+                {{ $disabled }}> Active for user viewing </label>
             @if ($type != 'show')
                 @if ($errors->has('is_active'))
                     <div class="form-error">
@@ -89,18 +91,33 @@
         </div>
     </div>
 
-    @if ($type == 'show')
+    @if (Helper::admin()) 
         <div class="form-group">
-            <a class="btn btn-primary" href="{{ route('courses.index') }}">Return</a>
-            <button type="submit"  class="btn btn-primary" href="/course/{{ $course->number }}/like">Like</button>
-            <button type="submit"  class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</button>
+            <label class="col-form-label form-label" for="remark">Remark (admin):</label>
+            @if ($type == 'show')
+            <div class="form-control" style="background-color: #e9ecef;"> {!! $edit->remark !!} </div>
+            @else
+                <textarea class="form-control" id="remark" name="remark" rows="3">{!! Helper::old('remark', $edit) !!}</textarea>
+                @if ($errors->has('remark'))
+                    <div class="form-error">
+                        <strong>{{ $errors->first('remark') }}</strong>
+                    </div>
+                @endif
+                <span class="form-help">Admin Note</span>
+            @endif
         </div>
-    @else
-        <div class="form-group">
+    @endif 
+
+    <div class="form-group">
+        @if ($type == 'show')
+            <a class="btn btn-primary" href="{{ route('courses.index') }}">Home</a>
+            <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
+            <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
+        @else
             <button type="submit" class="btn btn-primary">{{ $button }}</button>
             <a class="btn btn-secondary" href="{{ route('courses.index') }}">Cancel</a>
-        </div>
-    @endif
+        @endif
+    </div>
 
     <br>
 

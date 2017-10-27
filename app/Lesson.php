@@ -4,9 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Course;
+use App\User;
 
 class Lesson extends Model
 {
+    protected $guarded = [];
+
+    
     /**
      * Get Course from Lesson
      *
@@ -22,8 +26,14 @@ class Lesson extends Model
      *
      * @return mixed
      */
-    public function teachinglanguage()
+    public function teaching_language()
     {
-        return $this->belongsTo(Teachinglanguage::class);
+        return $this->belongsTo(TeachingLanguage::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'lesson_user');
+        return $this->belongsToMany('User::class', 'lesson_user');
     }
 }
