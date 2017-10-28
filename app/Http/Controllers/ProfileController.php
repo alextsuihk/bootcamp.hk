@@ -48,7 +48,8 @@ class ProfileController extends Controller
             $user->save();
 
             // send registration email to user
-            Mail::to($user)->send(new VerifyEmail($user));
+            $expireInMinutes = config('mail.email_verify_expire');       // Verification Token expires in xx mins
+            Mail::to($user)->send(new VerifyEmail($user, $expireInMinutes));
 
             // Flush message back
             session()->flash('messageAlertType','alert-warning');
@@ -74,7 +75,8 @@ class ProfileController extends Controller
             return view('profile.email_verify_fail', ['result' => 'nomatch']);
         } 
 
-        if (($user->email_token_created_at->diffInMinutes(now())) > 60) 
+        $expireInMinutes = config('email_verify_expire');
+        if (($user->email_token_created_at->diffInMinutes(now())) > $expireInMinutes) 
         {      // check if token is more than 60 mins
             return view('profile.email_verify_fail', ['result' => 'expired']);
         }

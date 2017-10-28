@@ -12,6 +12,7 @@
         'action'=> "/courses/$edit->id", 
         'method'=> method_field('PATCH'), 
         'button'=> 'Submit',
+        'cancel'   => route('courses.show',  [$edit->number]), 
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
 

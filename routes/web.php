@@ -22,9 +22,7 @@ Route::view('contactus', 'pages/contactus');
 /**
  * Courses Controller
  */
-/*Route::resource('courses', 'CourseController', ['only' =>[
-    'index','create','store','show','edit','update'
-]]);*/
+
 Route::resource('courses', 'CourseController', ['only' =>[
     'index','create','store', 'edit','update'
 ]]);

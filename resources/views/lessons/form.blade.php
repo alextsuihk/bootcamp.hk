@@ -129,7 +129,7 @@
                         <strong>{{ $errors->first('active') }}</strong>
                     </div>
                 @endif
-                <div class="form-help">course will be visible to usesr</div>
+                <div class="form-help">course will be visible to user</div>
             @endif
         </div>
     </div>
@@ -140,7 +140,8 @@
             @if ($type == 'show')
             <div class="form-control" style="background-color: #e9ecef;"> {!! $edit->remark !!} </div>
             @else
-                <textarea class="form-control" id="remark" name="remark" rows="3">{!! Helper::old('remark', $edit) !!}</textarea>
+                <textarea class="mceEditable form-control" id="remark" name="remark" rows="3">
+                {!! Helper::old('remark', $edit) !!}</textarea>
                 @if ($errors->has('remark'))
                     <div class="form-error">
                         <strong>{{ $errors->first('remark') }}</strong>
@@ -148,6 +149,22 @@
                 @endif
                 <span class="form-help">Admin Note</span>
             @endif
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" name="deleted" {{ Helper::old('deleted', $edit) ? 'checked' : '' }} 
+                    {{ $disabled }}> Deleted this course (hidden from all access) </label>
+                    @if ($type != 'show')
+                        @if ($errors->has('deleted'))
+                            <div class="form-error">
+                                <strong>{{ $errors->first('deleted') }}</strong>
+                            </div>
+                        @endif
+                        <div class="form-help">hidden from all access</div>
+                    @endif
+            </div>
         </div>
     @endif 
 

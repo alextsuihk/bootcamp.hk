@@ -14,7 +14,7 @@
     </script>
 
     <div class="row">
-        <span class="mr-auto"><h2>Course Detail</h2></span>
+        <span class="mr-auto ml-3"><h2>Course Detail</h2></span>
         <span class="ml-auto mr-5">
             <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
             <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
@@ -32,6 +32,7 @@
         'action'   => '#', 
         'method'   => '', 
         'button'   => '',
+        'cancel'   => route('courses.show',  [$course->number]), 
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
                             

@@ -16,9 +16,15 @@
             <li class="nav-item">
                 <a class="nav-link" href="/courses">Courses</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Questions</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="dropdown_questions" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Questions</a>
+                <div class="dropdown-menu" aria-labelledby="dropdown_questions">
+                    <a class="dropdown-item" href="#">Instruction</a>
+                    <a class="dropdown-item" href="#">Post</a>
+                    <a class="dropdown-item" href="#">Search</a>
+                </div>
             </li>
+
 {{--             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="dropdown_interns" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Interns</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown_interns">

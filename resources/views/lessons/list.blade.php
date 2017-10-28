@@ -1,4 +1,4 @@
-@if (!($course->is_active) && !Helper::admin())
+@if (!($course->active) && !Helper::admin())
     <div class="jumbotron">
         Course is not active, lesson information will NOT be shown<br>
         Please contact system administrator !
@@ -37,6 +37,8 @@
                     <?php $today=date("Y-m-d")  ;?>
                     @if (!($lesson->active))
                         <?php $status='<span style="color:red" title="Enrollment is closed">Inactive</span>'; ?>
+                    @elseif ($lesson->first_day == null || $lesson->last_day == null)
+                        <?php $status="Pending"; ?>
                     @elseif ($today >= $lesson->first_day)
                         <?php $status="Lesson Started"; ?>
                     @elseif ($today >= $lesson->last_day)

@@ -7,7 +7,7 @@
 @endphp
 
 @section ('content')
-    <script type="text/javascript">             // AT-Pending: scrollIntoView not working
+    <script>             // AT-Pending: scrollIntoView not working
         $(document).ready(function() {
             document.getElementById('lessonSection').scrollIntoView();
         }
@@ -32,6 +32,7 @@
         'action'   => '#', 
         'method'   => '', 
         'button'   => '',
+        'cancel'   => route('courses.show',  [$course->number]), 
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
                             

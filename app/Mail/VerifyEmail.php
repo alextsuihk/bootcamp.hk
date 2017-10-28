@@ -17,9 +17,10 @@ class VerifyEmail extends Mailable
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(User $user, $expireInMinutes)
     {
         $this->user = $user;
+        $this->expireInMinutes =$expireInMinutes;
     }
 
     /**
@@ -33,7 +34,7 @@ class VerifyEmail extends Mailable
 
         return $this->subject('Verify Email')
             ->markdown('emails.verifyemail', 
-            ['user' => $this->user, 'url' => $url]
+            ['user' => $this->user, 'url' => $url, 'expireInMinutes' => $this->expireInMinutes]
         );
     }
 }

@@ -31,7 +31,9 @@ class LessonStoreUpdate extends FormRequest
             'last_day' => 'nullable|date',
             'schedule' => 'nullable',
             'active' => 'sometimes',
+            'delete' => 'sometimes',
             'quota' => 'nullable|integer',
+            'remark' => 'sometimes',
         ];
     }
 

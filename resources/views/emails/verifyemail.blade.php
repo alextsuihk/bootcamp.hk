@@ -2,7 +2,8 @@
 
 Hello, {{ $user->nickname }}
 
-Please click the Button below to verify your email address.
+Please click the Button below to verify your email address.<br>
+Token will expire in {{ $expireInMinutes }} minutes.
 
 @component('mail::button', ['url' => $url])
 Verify Email

@@ -34,6 +34,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
+        // AT-Pending: potential issue: "enroll" is a post request, without login, "redirect previous" will
         $this->redirectTo = url()->previous();
         $this->middleware('guest')->except('logout');
     }

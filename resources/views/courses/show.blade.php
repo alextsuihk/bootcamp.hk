@@ -8,7 +8,7 @@
 
 @section ('content')
     <div class="row">
-        <span class="mr-auto"><h2>Course Detail</h2></span>
+        <span class="mr-auto ml-3"><h2>Course Detail</h2></span>
         <span class="ml-auto mr-5">
             <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
             <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
@@ -26,11 +26,12 @@
         'action'   => '#', 
         'method'   => '', 
         'button'   => '',
+        'cancel'   => route('courses.index'), 
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
 
     <div class="row">
-        <span class="mr-auto">
+        <span class="mr-auto ml-3">
             <h3 id="lessonList">Class Offerings</h3>
         </span>
         @auth 
@@ -45,9 +46,3 @@
     @include ('lessons.list')
 
 @endsection
-
-{{-- <script type="text/javascript">    // no need to include, popper.js already included in layouts/master.blade.php
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-</script> --}}

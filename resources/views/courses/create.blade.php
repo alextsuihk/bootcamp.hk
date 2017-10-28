@@ -16,7 +16,8 @@
         'action'   => '/courses', 
         'method'   => '', 
         'button'   =>'Submit',
-        ]) 
+        'cancel'   => route('courses.index'), 
+        ])
 @endsection
 
 {{-- 'action'=>action('CourseController@store'), --}}

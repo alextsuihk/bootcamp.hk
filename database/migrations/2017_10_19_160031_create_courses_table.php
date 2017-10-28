@@ -21,9 +21,9 @@ class CreateCoursesTable extends Migration
             $table->integer('level_id')->unsigned()->default(21); 
             $table->foreign('level_id')->references('id')->on('levels');
             //$table->string('gitlab_uri')->nullable();   // e.g. courses/201
-            $table->boolean('is_active')->default(false);
+            $table->boolean('active')->default(false);
             $table->boolean('deleted')->default(false);
-            $table->text('remark')->nullable();
+            $table->mediumText('remark')->nullable();
             $table->timestamps();
         });
         //DB::update("ALTER TABLE courses AUTO_INCREMENT = 100;");

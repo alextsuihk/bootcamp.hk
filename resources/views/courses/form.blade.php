@@ -7,7 +7,7 @@
     <input type="hidden" name="course_id" value="{{ $course->id }}" /> --}}
     <div class="form-group">
         <label class="col-form-label form-label" for="title">Course Number:</label>
-        <input type="number" class="col-1 form-control" id="number" name="number" 
+        <input type="text" class="col-1 form-control" id="number" name="number" 
         value="{{ Helper::old('number', $edit) }}" placeholder="101" 
         required {{ $disabled }} {{ $course_num_readonly }}>
         @if ($type != 'show')
@@ -43,7 +43,8 @@
         </div>
         <div class="form-group">
             <label class="col-form-label form-label" for="abstract">Abstract:</label>
-            <div class="form-control" style="background-color: #e9ecef;"> {!! $edit->abstract !!} </div>
+            <div class="form-control mceNonEditable" style="background-color: #e9ecef;">
+                {!! $edit->abstract !!}</div>
         </div>
     @else
         <div class="form-group">
@@ -54,18 +55,19 @@
                     <option <?php if ($level->id == Helper::old('level_id', $edit)) { echo "selected";} ?>
                      value="{{ $level->id }}">{{ $level->difficulty }}</option>
                 @endforeach
-                </select>
-                @if ($errors->has('level_id'))
-                    <div class="form-error">
-                        <strong>{{ $errors->first('level_id') }}</strong>
-                    </div>
-                @endif
-                <span class="form-help">how difficult is this course</span>
+            </select>
+            @if ($errors->has('level_id'))
+                <div class="form-error">
+                    <strong>{{ $errors->first('level_id') }}</strong>
+                </div>
+            @endif
+            <span class="form-help">how difficult is this course</span>
         </div>
         <div class="form-group">
-            <label class="col-form-label form-label" for="abstract">Abstract: (use TinyMCE)</label>
-            <textarea class="form-control" id="abstract" name="abstract" rows="15" 
-            required>{!! Helper::old('abstract', $edit) !!}</textarea>
+            <label class="col-form-label form-label" for="abstract">Abstract:</label>
+
+            <textarea class="mceEditable form-control" id="abstract" name="abstract" rows="15">
+            {!! Helper::old('abstract', $edit) !!}</textarea>
             @if ($errors->has('abstract'))
                 <div class="form-error">
                     <strong>{{ $errors->first('abstract') }}</strong>
@@ -78,16 +80,16 @@
     <div class="form-group">
         <div class="checkbox-inline">
             <label>
-                <input type="checkbox" name="is_active" {{ Helper::old('is_active', $edit) ? 'checked' : '' }} 
+                <input type="checkbox" name="active" {{ Helper::old('active', $edit) ? 'checked' : '' }} 
                 {{ $disabled }}> Active for user viewing </label>
-            @if ($type != 'show')
-                @if ($errors->has('is_active'))
-                    <div class="form-error">
-                        <strong>{{ $errors->first('is_active') }}</strong>
-                    </div>
+                @if ($type != 'show')
+                    @if ($errors->has('active'))
+                        <div class="form-error">
+                            <strong>{{ $errors->first('active') }}</strong>
+                        </div>
+                    @endif
+                    <div class="form-help">course will be visible to user</div>
                 @endif
-                <div class="form-help">course will be visible to usesr</div>
-            @endif
         </div>
     </div>
 
@@ -97,7 +99,8 @@
             @if ($type == 'show')
             <div class="form-control" style="background-color: #e9ecef;"> {!! $edit->remark !!} </div>
             @else
-                <textarea class="form-control" id="remark" name="remark" rows="3">{!! Helper::old('remark', $edit) !!}</textarea>
+                <textarea class="mceEditable form-control" id="remark" name="remark" rows="3">
+                {!! Helper::old('remark', $edit) !!}</textarea>
                 @if ($errors->has('remark'))
                     <div class="form-error">
                         <strong>{{ $errors->first('remark') }}</strong>
@@ -105,6 +108,22 @@
                 @endif
                 <span class="form-help">Admin Note</span>
             @endif
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" name="deleted" {{ Helper::old('deleted', $edit) ? 'checked' : '' }} 
+                    {{ $disabled }}> Deleted this course</label>
+                    @if ($type != 'show')
+                        @if ($errors->has('deleted'))
+                            <div class="form-error">
+                                <strong>{{ $errors->first('deleted') }}</strong>
+                            </div>
+                        @endif
+                        <div class="form-help">hidden from all access</div>
+                    @endif
+            </div>
         </div>
     @endif 
 
@@ -115,7 +134,7 @@
             <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
         @else
             <button type="submit" class="btn btn-primary">{{ $button }}</button>
-            <a class="btn btn-secondary" href="{{ route('courses.index') }}">Cancel</a>
+            <a class="btn btn-secondary" href="{{ $cancel }}">Cancel</a>
         @endif
     </div>
 

@@ -28,7 +28,7 @@ class LessonController extends Controller
      */
     public function enroll($id)
     {
-        $lesson = Lesson::find($id);    // get $lesson instance
+        $lesson = Lesson::where('deleted', false)->find($id);    // get $lesson instance
         $enrolled = $lesson->users()->where('id', Auth::id())->exists();
 
         if ($enrolled)
@@ -44,6 +44,8 @@ class LessonController extends Controller
             session()->flash('message','Lesson is enrolled successfully. See you in the class');
         } 
 
+        $tag = 'user_'.Auth::id();
+        Cache::tags($tag)->flush();             // flush user cache
         return redirect()->back();
     }
 
@@ -54,7 +56,7 @@ class LessonController extends Controller
      */
     public function cancel($id)
     {
-        $lesson = Lesson::find($id);    // get $lesson instance
+        $lesson = Lesson::where('deleted', false)->find($id);    // get $lesson instance
         $enrolled = $lesson->users()->where('id', Auth::id())->exists();
 
         if ($enrolled)
@@ -69,6 +71,8 @@ class LessonController extends Controller
             session()->flash('message','Something is wrong, please contact system admin');
         }
 
+        $tag = 'user_'.Auth::id();
+        Cache::tags($tag)->flush();             // flush user cache
         return redirect()->back();
     }
 
@@ -104,7 +108,7 @@ class LessonController extends Controller
     {
         $max = Lesson::where('course_id', '=', $request->course_id)->pluck('sequence')->max();
                         // get the last sequence# from lesson table (where course_id)
-        $newSeq = ($max == null) ? 0: $max+1;
+        $newSeq = ($max == null && $max != 0) ? 0: $max+1;
 
         $lesson = Lesson::create([ 
             'course_id' => $request->course_id,
@@ -115,8 +119,10 @@ class LessonController extends Controller
             'first_day' => $request->first_day,
             'last_day' => $request->last_day,
             'schedule' => $request->schedule,
-            'active' => ($request->active ? true : false ),
             'quota' => $request->quota,
+            'active' => ($request->active ? true : false ),
+            'deleted' => ($request->deleted ? true : false ),
+            'remark' => $request->remark,
         ]);
         $lesson->save();
 
@@ -168,9 +174,6 @@ class LessonController extends Controller
     {
         $lesson = lesson::with('course')->find($id);    // pull original data, id does not change, must reference id
         
-        //dump($lesson->course->number);
-        //dd($lesson);
-
         $lesson->venue = $request->venue;
         $lesson->instructor = $request->instructor;
         $lesson->teaching_language_id = $request->teaching_language_id;
@@ -179,6 +182,7 @@ class LessonController extends Controller
         $lesson->schedule = $request->schedule;
         $lesson->quota = $request->quota;
         $lesson->active = ($request->active ? true : false );
+        $lesson->deleted = ($request->deleted ? true : false );
         $lesson->remark =  $request->remark;
 
         $lesson->save();

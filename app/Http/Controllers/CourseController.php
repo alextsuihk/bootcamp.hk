@@ -57,15 +57,22 @@ class CourseController extends Controller
     //public function store(Request $request)
     public function store(CourseStoreUpdate $request)   // type-hinted & do rule validation
     {
-
-        //Course::create(request(['number', 'title', 'abstract', 'level_id', 'is_active']) );
+        //Course::create(request(['number', 'title', 'abstract', 'level_id', 'active']) );
         // stupid bootstrap returns "on" for checkbox, cannot use mass assignment
+
+        if (is_numeric($request->number))
+        {
+            $number = sprintf("%03d", $request->number);
+        } else {
+            $number = $request->number;
+        }
         $course = Course::create([ 
-            'number' => sprintf("%03d", $request->number),
+            'number' => $number,
             'title' => $request->title,
             'abstract' => $request->abstract,
             'level_id' => $request->level_id,
-            'is_active' => ($request->is_active ? true : false ),
+            'active' => ($request->active ? true : false ),
+            'deleted' => ($request->deleted ? true : false ),
             'remark' => $request->remark,
         ]);
 
@@ -141,7 +148,8 @@ class CourseController extends Controller
         $course->title = $request->title;
         $course->abstract = $request->abstract;
         $course->level_id = $request->level_id;
-        $course->is_active = ($request->is_active ? true : false );
+        $course->active = ($request->active ? true : false );
+        $course->deleted = ($request->deleted ? true : false );
         $course->remark =  $request->remark;
 
         $course->save();

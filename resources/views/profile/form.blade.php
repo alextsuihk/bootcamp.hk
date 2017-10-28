@@ -45,18 +45,19 @@
                 <strong>{{ $errors->first('mobile') }}</strong>
             </div>
         @endif
-        <span class="form-help">format: 91234567</span>
+        <span class="form-help">(optional field) format: 91234567</span>
     </div>
 
-
-{{--     <div class="form-group">
-        <div class="checkbox-inline">
-            <label>
-                <input type="checkbox" name="is_active" {{ Helper::old('is_active', $user) ? 'checked' : '' }} 
-                {{ $disabled }}> Active for Enrollment </label>
-                <span class="form-help">course will be visible to usesr</span>
+    @if (Helper::admin())
+        <div class="form-group">
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" name="active" {{ Helper::old('active', $user) ? 'checked' : '' }} 
+                    {{ $disabled }}>Active</label>
+                    <span class="form-help">User is active &amp; allow to login</span>
+            </div>
         </div>
-    </div> --}}
+    @endif
 
     @if ($type == 'show')
         <div class="form-group">

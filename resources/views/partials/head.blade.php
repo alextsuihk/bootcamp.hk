@@ -16,8 +16,35 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js" crossorigin="anonymous"></script>
 
+{{-- TinyMCE --}}
+<script src='/tinymce/tinymce.min.js'></script>
+{{-- <link rel="stylesheet" href="/tinymce/jquery/tinymce.min.css"> --}}
+<script type="text/javascript">
+    tinymce.init({
+        selector: 'textarea',
+
+        plugins: "autosave autolink contextmenu code codesample help hr image imagetools link lists paste preview save searchreplace table textcolor noneditable ",
+        
+        /*menubar: "file edit view insert format tools help",*/
+        
+        toolbar: "preview restoredraft | paste searchreplace link hr | codesample | forecolor fontselect fontsizeselect h1 h2 bold italic underline strikethrough superscript subscript | numlist bullist  | help",
+
+        contextmenu: "preview paste codesample link hr | inserttable cell row column deletetable",
+
+        paste_data_images: true, 
+        branding: true,
+        noneditable_editable_class: "mceEditable",
+        noneditable_noneditable_class: "mceNonEditable",
+    });
+</script>
+
+{{-- Prism for displaying  --}}
+<script src='/prism.js'></script>
+<link rel="stylesheet" href="/prism.css">
+
 
 <meta name="description" content="Bootcamp.HK is a platform supporting new engineers & developers to catch up the latest techology ">
+
 <meta name="author" content="Alex">
 
 <link rel="icon" href="/favicon.ico">

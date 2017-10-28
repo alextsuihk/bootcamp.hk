@@ -14,12 +14,17 @@ class LevelsTableSeeder extends Seeder
     {
         DB::table('levels')->insert([
             'id' => 10,
-            'difficulty' => 'Secondary',
+            'difficulty' => 'High School',
         ]);
 
         DB::table('levels')->insert([
             'id' => 11,
             'difficulty' => 'Non-STEM',
+        ]);
+
+        DB::table('levels')->insert([
+            'id' => 20,
+            'difficulty' => 'Teardown Series',
         ]);
 
         DB::table('levels')->insert([
