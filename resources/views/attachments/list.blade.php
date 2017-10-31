@@ -24,25 +24,28 @@
                         <td>{{ $attachment->filename }}</td>
                         <td>{{ $attachment->description }}</td>
 
-                        <form method="POST" action="/attachments/download">
+                        <form method="POST" action="/attachments/action">
                             {{ csrf_field() }}
+                            <input type="hidden" name="course_number" value="{{ $course->number }}">
+                            
                             <td>
                                 <select class="form-control custom-select" id="revision_id" name="revision_id">
                                     <option selected value="{{ $attachment->attachment_revisions->first()->id }}">Latest</option>
                                     @foreach ($attachment->attachment_revisions as $revision)
+                                        <?php $disabled = ($revision->disabled)?"[disabled]":""; ?>
                                         <option value="{{ $revision->id }}">
-                                            Rev: {{ $revision->revision }} &nbsp;&nbsp; 
-                                            ({{ date_format($revision->created_at, 'Y-m-d') }})</option>
+                                            Rev {{ $revision->revision }}  
+                                            ({{ date_format($revision->created_at, 'Y-m-d') }}) 
+                                            {{ $disabled }}</option>
                                     @endforeach
                                 </select>
                             </td>
                             <td><center>
-                                <button type="submit" class="btn btn-primary">Download</button>
+                                <button type="submit" name="action" value="download" class="btn btn-primary">Download</button>
                                 @if (Helper::admin())
                                     <button id="appendMoreModal" type="button" class="btn btn-primary" data-toggle="modal" data-target="#appendMore" data-id="{{ $attachment->id }}">Update Revision</button>
-                                    <a class="btn btn-secondary" href="/">Enable</a>
-                                    <button type="submit" class="btn btn-primary">Enable</button>
-                                    <button type="submit" class="btn btn-primary">Disable</button>
+                                    <button type="submit" name="action" value="enable" class="btn btn-primary">Enable</button>
+                                    <button type="submit" name="action" value="disable" class="btn btn-primary">Disable</button>
                                 @endif
                             </center></td>
                         </form>

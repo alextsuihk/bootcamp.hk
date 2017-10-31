@@ -43,9 +43,8 @@ Route::patch('lessons/{id}', 'LessonController@update')->name('lesson.update');
  * File Attachment Controller: upload file attachment and assoicate to a course
  */
 Route::post('attachments/upload', 'AttachmentController@store')->name('attachment.upload');
-Route::post('attachments/download', 'AttachmentController@download')->name('attachment.download');
-Route::get('attachments/{id}/enable', 'AttachmentController@enable')->name('attachment.enable');
-Route::get('attachments/{id}/disable', 'AttachmentController@disable')->name('attachment.disable');
+Route::post('attachments/action', 'AttachmentController@action')->name('attachment.action');  
+                                                        //download, enable & disable
 
 /**
  * User Profile
