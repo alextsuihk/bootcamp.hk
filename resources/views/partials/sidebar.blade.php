@@ -73,7 +73,7 @@ show My_Question: no of unread answered
         <span class="nav-link"><strong>Contact</strong></span>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="http://gitlab.bootcamp.hk" target="_blank">Gitlab</a>
+        <a class="nav-link" href="https://gitlab.bootcamp.hk/dashboard" target="_blank">Gitlab</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="#">Twitter</a>

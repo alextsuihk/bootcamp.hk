@@ -75,6 +75,36 @@ class CoursesTableSeeder extends Seeder
 
         DB::table('courses')->insert([
             'number' => '120',
+            'title' => 'Overview on x86 PC & Server',
+            'abstract' => 'BIOS, BMC, SIO, Server, various technology & acronym, IC Packaging, Section on server',
+            'active' => 1,
+            'level_id' => 21,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('courses')->insert([
+            'number' => '122',
+            'title' => 'Overview on SoC',
+            'abstract' => '',
+            'active' => 1,
+            'level_id' => 21,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('courses')->insert([
+            'number' => '130',
+            'title' => 'IOT (Internet of Things',
+            'abstract' => '',
+            'active' => 1,
+            'level_id' => 21,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('courses')->insert([
+            'number' => '140',
             'title' => 'Hardware Design Best Practices',
             'abstract' => 'Circuit Design, Schematic, Layout',
             'active' => 1,
@@ -83,5 +113,14 @@ class CoursesTableSeeder extends Seeder
             'updated_at' => Carbon::now(),
         ]);
 
+        DB::table('courses')->insert([
+            'number' => 'T10',
+            'title' => 'Tear-Down: SmartPhone',
+            'abstract' => 'to be determined',
+            'active' => 1,
+            'level_id' => 21,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
     }
 }

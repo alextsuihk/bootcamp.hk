@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 class Level extends Model
 {
     /**
-     * Get all Difficulty Level info from datadata & cache
+     * Get all Difficulty Level info & cache
      *
      * @return object
      */
@@ -22,7 +22,7 @@ class Level extends Model
     }
 
     /**
-     * Get Courses from Level
+     * Level has many courses
      *
      * @return object
      */

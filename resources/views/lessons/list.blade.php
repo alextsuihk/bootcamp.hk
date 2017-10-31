@@ -83,19 +83,14 @@
                         <td><center>{!! $status !!}</center></td>
                         <td><center>
                             @if ($showEnrollButton && !($hideButton))
-                               <form method="POST" action="/lessons/{{ $lesson->id }}/enroll">
-                                    {{ csrf_field() }}
-                                    <button type="submit" class="" data-toggle="tooltip" data-placement="top" title="Click to enroll">
-                                        <img src="/img/add.png" alt="enroll">
-                                    </button>
-                                </form>
+                                <a class="" data-toggle="tooltip" data-placement="top" title="Click to enroll" 
+                                href="/lessons/{{ $lesson->id }}/enroll/{{ $course->number }}"><img src="/img/add.png" alt="enroll"></a>
                             @elseif ($showCancelButton && !($hideButton))
-                                <form method="POST" action="/lessons/{{ $lesson->id }}/cancel" >
-                                    {{ csrf_field() }}
-                                    <button type="submit" class="" data-toggle="tooltip" data-placement="top" title="Click to cancel enrollment">
+                                <a class="" data-toggle="tooltip" data-placement="top" title="Click to cancel enrollment" href="/lessons/{{ $lesson->id }}/cancel/{{ $course->number }}"><img src="/img/remove.png" alt="enroll"></a>
+{{--                                     <button type="submit" class="" data-toggle="tooltip" data-placement="top" title="Click to cancel enrollment">
                                         <img src="/img/remove.png" alt="cancel">
-                                    </button>
-                                </form>
+                                    </button> --}}
+
                             @elseif ($showCancelButton && $hideButton)
                                 Enrolled
                             @endif

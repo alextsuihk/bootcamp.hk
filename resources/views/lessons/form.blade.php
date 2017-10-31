@@ -4,6 +4,7 @@
                         {{-- we also add a custom helper in \app\Helpers\Helper.php  --}}
 
     <input type="hidden" name="course_id" value="{{ $course->id }}" />
+    <input type="hidden" name="course_number" value="{{ $course->number }}" />
     @if ($type != 'create')
         <div class="form-group">
             <label class="col-form-label form-label" for="sequence">Seq Number:</label>

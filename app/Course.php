@@ -11,7 +11,7 @@ class Course extends Model
     protected $guarded = [];
 
     /**
-     * Get Lessons from Course
+     * Course has many lessons
      *
      * @return mixed
      */
@@ -21,7 +21,18 @@ class Course extends Model
     }
 
     /**
-     * Get Difficult Levels status of a course
+     * Course has many attachments
+     *
+     * @return mixed
+     */
+    public function attachments()
+    {
+        return $this->hasMany(Attachment::class);
+    }
+
+
+    /**
+     * Course belongs to a (difficulty) level
      *
      * @return mixed
      */
@@ -45,7 +56,6 @@ class Course extends Model
                 }
             });
         }
-
         return $query;
     }
 }

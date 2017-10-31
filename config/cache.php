@@ -2,6 +2,7 @@
 
 return [
 
+    'prefix' => env('CACHE_PREFIX', 'default'),  
     /*
     |--------------------------------------------------------------------------
     | Default Cache Store

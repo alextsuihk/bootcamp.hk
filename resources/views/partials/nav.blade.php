@@ -20,8 +20,8 @@
                 <a class="nav-link dropdown-toggle" id="dropdown_questions" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Questions</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown_questions">
                     <a class="dropdown-item" href="#">Instruction</a>
-                    <a class="dropdown-item" href="#">Post</a>
-                    <a class="dropdown-item" href="#">Search</a>
+                    <a class="dropdown-item" href="#">Ask Question</a>
+                    <a class="dropdown-item" href="#">Search Answer</a>
                 </div>
             </li>
 
@@ -38,8 +38,8 @@
                 <div class="dropdown-menu" aria-labelledby="dropdown_aboutus">
                     <a class="dropdown-item" href="/aboutus">About Us</a>
                     <a class="dropdown-item" href="/contactus">Contact Us</a>
-                    <a class="dropdown-item" href="/aboutus#SponsorVenue">Venue Support</a>
-                    <a class="dropdown-item" href="#">Consultant Services</a>
+{{--                     <a class="dropdown-item" href="/aboutus#SponsorVenue">Venue Support</a>
+                    <a class="dropdown-item" href="#">Consultant Services</a> --}}
                 </div>
             </li>
         </ul>

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 class TeachingLanguage extends Model
 {
     /**
-     * Get all Teaching Language info from datadata & cache
+     * Get all Teaching Language info & cache
      *
      * @return object
      */
@@ -22,11 +22,11 @@ class TeachingLanguage extends Model
     }
 
     /**
-     * Get Language from Lesson
+     * Teaching Langauge has many lessons
      *
      * @return mixed
      */
-    public function lesson()
+    public function lessons()
     {
         return $this->hasMany(Lesson::class);
     }

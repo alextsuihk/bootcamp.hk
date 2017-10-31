@@ -5,15 +5,13 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Course;
-use App\User;
 
 class Lesson extends Model
 {
     protected $guarded = [];
     
     /**
-     * Get Course from Lesson
+     * Lesson belongs to a course
      *
      * @return mixed
      */
@@ -23,7 +21,17 @@ class Lesson extends Model
     }
 
     /**
-     * Get Difficult Levels status of a course
+     * Lesson has many files
+     *
+     * @return mixed
+     */
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
+    }
+
+    /**
+     * Lesson belongs to a technical_language
      *
      * @return mixed
      */
@@ -46,8 +54,7 @@ class Lesson extends Model
     {
         $now = date('Y-m-d');
         $key = 'user_'.Auth::id().'_myCurrentLessons';
-        $tag = 'user_'.Auth::id();
-        $myCurrentLessons = Cache::tags($tag)->remember($key, 5, function() use ($now) {
+        $myCurrentLessons = Cache::remember($key, 5, function() use ($now) {
             return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $now)->where('last_day', '>=', $now)->count();
         });
 
@@ -63,8 +70,7 @@ class Lesson extends Model
     {
         $now = date('Y-m-d');
         $key = 'user_'.Auth::id().'_myFutureLessons';
-        $tag = 'user_'.Auth::id();
-        $myFutureLessons = Cache::tags($tag)->remember($key, 5, function() use ($now) {
+        $myFutureLessons = Cache::remember($key, 5, function() use ($now) {
             return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $now)->count();
         });
 

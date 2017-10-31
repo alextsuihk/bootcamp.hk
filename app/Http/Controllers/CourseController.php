@@ -14,6 +14,7 @@ class CourseController extends Controller
     public function __construct()
     {
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
+        $this->prefix = config('cache.prefix');
     }
 
     /**
@@ -29,9 +30,11 @@ class CourseController extends Controller
 
         } else {
                                      // only caching for read-only (index & show)
-            $courses = Cache::tags(['courses'])->remember('CourseWithLevelSortByNumber', 5, function() {
+            $key = $this->prefix.'CourseWithLevelSortByNumber';
+            $courses = Cache::remember($key, 5, function() {
                 return Course::with('level')->get()->sortBy('number');
             });                     // turn on eager loading
+
             $keywords = 'Search... (placeholder)';                  // index & search use the same view
         }
         return view('courses.index', compact(['courses', 'keywords']));
@@ -76,7 +79,9 @@ class CourseController extends Controller
             'remark' => $request->remark,
         ]);
 
-        Cache::tags('courses')->flush();                    // flush 'courses' cache (no need to wait to expire)
+        $key = $this->prefix.'CourseWithLevelSortByNumber';
+        Cache::forget($key);        // flush 'courses' cache (no need to wait to expire)
+        session()->flash('messageAlertType','alert-success');
         session()->flash('message','A new course is added');
         
         //return redirect('/courses/'.$course->id);     // let do it in Laravel way
@@ -92,12 +97,16 @@ class CourseController extends Controller
     {
         // only cache & eager loading Course & Lession
         // user enrollment will be using lazy loading
-        $key = 'Course'.$number;         
-        $course = Cache::tags(['courses', 'lessons'])->remember($key, 5, function() use ($number) {
-            return Course::with(['level','lessons', 'lessons.teaching_language', 'lessons.users'])->where('number', '=', $number)->where('deleted', false )->first();
+        $key = $this->prefix.'Course_'.$number;         
+        $course = Cache::remember($key, 5, function() use ($number) {
+            return Course::with(['level','lessons', 'lessons.teaching_language', 'lessons.users', 'attachments'])
+            ->with(['attachments.attachment_revisions' => function ($query) { 
+                    $query->orderBy('id', 'desc');      // I want to sortByDesc attachment_revisions.id
+                }])
+            ->where('number', '=', $number)->where('deleted', false)->first();
         });                                 // enable eager loading + cache
 
-        //dd($course);                      // Alex: just to make sure super nested eager loading has happend
+        //dd($course);                      // Alex: to check super nested eager loading result
         if (empty($course))
         {
             session()->flash('messageAlertType','alert-warning');
@@ -115,8 +124,8 @@ class CourseController extends Controller
         }
 
         $lessons = $course->lessons->sortbyDesc('first_day');       // sortBy first_day DESC
-
-        return view('courses.show', compact(['course', 'lessons']));
+        $attachments = $course->attachments;
+        return view('courses.show', compact(['course', 'lessons', 'attachments']));
     }
     /**
      * Show the form for editing the specified resource.
@@ -154,8 +163,10 @@ class CourseController extends Controller
 
         $course->save();
 
-        Cache::forget('Course'.$course->number);                        // flush this key in cache
+        $key = $this->prefix.'Course_'.$course->number;  
+        Cache::forget($key);                // forget this key (course_number)
 
+        session()->flash('messageAlertType','alert-success');
         session()->flash('message','Course detail is updated');
         return redirect()->route('courses.show', $course->number);
         //return redirect()->action('CourseController@show', ['course' => $course->number]);

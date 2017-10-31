@@ -14,11 +14,11 @@ use App\TeachingLanguage;
 
 class LessonController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth')->only(['enroll', 'cancel']);
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
+        $this->prefix = config('cache.prefix');
     }
 
     /**
@@ -26,9 +26,9 @@ class LessonController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function enroll($id)
+    public function enroll($lesson_id, $course_number)
     {
-        $lesson = Lesson::where('deleted', false)->find($id);    // get $lesson instance
+        $lesson = Lesson::where('deleted', false)->find($lesson_id);    // get $lesson instance
         $enrolled = $lesson->users()->where('id', Auth::id())->exists();
 
         if ($enrolled)
@@ -38,15 +38,22 @@ class LessonController extends Controller
             session()->flash('message','Something is wrong, please contact system admin');
             // if requesting to enroll & not yet enrolled
         } else {
-            $lesson->users()->attach(Auth::id());
+            $lesson->users()->attach(Auth::id(), ['enrolled_at' => now()]);
             // AT-Pending: queue email to user, cc enrollment@bootcamp.hk
             session()->flash('messageAlertType','alert-success');
             session()->flash('message','Lesson is enrolled successfully. See you in the class');
         } 
 
-        $tag = 'user_'.Auth::id();
-        Cache::tags($tag)->flush();             // flush user cache
-        return redirect()->back();
+        $key = 'user_'.Auth::id().'_myCurrentLessons';          // for sidebar My Shortcut
+        Cache::forget($key);
+
+        $key = 'user_'.Auth::id().'_myFutureLessons';
+        Cache::forget($key);
+
+        $key = $this->prefix.'Course_'.$course_number;  
+        Cache::forget($key);                // forget this key (course_number), because of nested eager loading
+
+        return redirect()->route('courses.show', [$course_number]);
     }
 
     /**
@@ -54,9 +61,9 @@ class LessonController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function cancel($id)
+    public function cancel($lesson_id, $course_number)
     {
-        $lesson = Lesson::where('deleted', false)->find($id);    // get $lesson instance
+        $lesson = Lesson::where('deleted', false)->find($lesson_id);    // get $lesson instance
         $enrolled = $lesson->users()->where('id', Auth::id())->exists();
 
         if ($enrolled)
@@ -71,9 +78,16 @@ class LessonController extends Controller
             session()->flash('message','Something is wrong, please contact system admin');
         }
 
-        $tag = 'user_'.Auth::id();
-        Cache::tags($tag)->flush();             // flush user cache
-        return redirect()->back();
+        $key = 'user_'.Auth::id().'_myCurrentLessons';          // for sidebar My Shortcut
+        Cache::forget($key);
+
+        $key = 'user_'.Auth::id().'_myFutureLessons';
+        Cache::forget($key);
+
+        $key = $this->prefix.'Course_'.$course_number;  
+        Cache::forget($key);                // forget this key (course_number), because of nested eager loading
+
+        return redirect()->route('courses.show', [$course_number]);
     }
 
     /**
@@ -108,11 +122,10 @@ class LessonController extends Controller
     {
         $max = Lesson::where('course_id', '=', $request->course_id)->pluck('sequence')->max();
                         // get the last sequence# from lesson table (where course_id)
-        $newSeq = ($max == null && $max != 0) ? 0: $max+1;
 
         $lesson = Lesson::create([ 
             'course_id' => $request->course_id,
-            'sequence' => $newSeq,
+            'sequence' => $max+1,
             'venue' => $request->venue,
             'instructor' => $request->instructor,
             'teaching_language_id' => $request->teaching_language_id,
@@ -126,12 +139,13 @@ class LessonController extends Controller
         ]);
         $lesson->save();
 
-        Cache::tags('lessons')->flush();                    // flush 'lessons' cache (no need to wait to expire)
-        session()->flash('message','A new lesson is added');
-        
-        $course = Course::find($request->course_id);
+        $key = $this->prefix.'Course_'.$request->course_number;
+        Cache::forget($key);
 
-        return redirect()->route('courses.show', [$course->number]);
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message','A new lesson is added');
+
+        return redirect()->route('courses.show', [$request->course_number]);
     }
 
     /**
@@ -187,8 +201,10 @@ class LessonController extends Controller
 
         $lesson->save();
 
-        Cache::forget('Course'.$lesson->course->number);                        // flush this key in cache
+        $key = $this->prefix.'Course_'. $lesson->course->number;
+        Cache::forget($key);
 
+        session()->flash('messageAlertType','alert-success');
         session()->flash('message','Course detail is updated');
         return redirect()->route('courses.show', $lesson->course->number);
     }

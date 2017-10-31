@@ -1,3 +1,4 @@
+php artisan cache:clear
 php artisan migrate:fresh --seed
 #php artisan migrate:fresh
 #php artisan db:seed
@@ -5,4 +6,6 @@ php artisan migrate:fresh --seed
 #php artisan db:seed --class=LangusagesTableSeeder
 #php artisan db:seed --class=UsersTableSeeder
 #php artisan db:seed --class=LevelsTableSeeder
+
+sudo rm -rf  storage/app/files/*
 

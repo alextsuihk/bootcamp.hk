@@ -30,6 +30,21 @@
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
 
+
+    <div class="row">
+        <span class="mr-auto ml-3">
+            <h3 id="lessonList">File Attachment for downloads</h3>
+        </span>
+        @auth 
+            @if (Helper::admin())
+                <span class="ml-auto mr-5">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadNew">Add New File</button>
+                </span>
+            @endif
+        @endauth
+    </div>
+    @include ('attachments.list')
+
     <div class="row">
         <span class="mr-auto ml-3">
             <h3 id="lessonList">Class Offerings</h3>
@@ -44,5 +59,7 @@
     </div>
 
     @include ('lessons.list')
+
+    @include ('attachments.modal')
 
 @endsection

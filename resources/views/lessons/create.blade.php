@@ -18,7 +18,7 @@
         <span class="ml-auto mr-5">
             <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
             <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
-            @if (Auth::check() && auth()->user()->admin)
+            @if (Helper::admin())
                 <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="/courses/{{ $course->number }}/edit">
                     <img src="/img/edit.png" alt="Edit"></a>
             @endif
@@ -47,7 +47,7 @@
         'action'   => '/lessons/', 
         'method'   => '', 
         'button'   =>'Submit',
-        'previousUrl' => url()->previous(),
+        'previousUrl' => route('courses.show',  [$course->number]),
         ]) 
 
 @endsection

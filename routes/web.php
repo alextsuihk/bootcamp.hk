@@ -31,12 +31,21 @@ Route::get('courses/{course}/{slug?}', 'CourseController@show')->name('courses.s
 /**
  * Lesson Controller
  */
-Route::post('lessons/{id}/enroll', 'LessonController@enroll')->name('lesson.enroll');
-Route::post('lessons/{id}/cancel', 'LessonController@cancel')->name('lesson.cancel');
+Route::get('lessons/{id}/enroll/{course}', 'LessonController@enroll')->name('lesson.enroll');
+Route::get('lessons/{id}/cancel/{course}', 'LessonController@cancel')->name('lesson.cancel');
 Route::get('lessons/create/{course_id}', 'LessonController@create')->name('lesson.create');
 Route::post('lessons/', 'LessonController@store')->name('lesson.store');
 Route::get('lessons/{id}/edit', 'LessonController@edit')->name('lesson.edit');
 Route::patch('lessons/{id}', 'LessonController@update')->name('lesson.update');
+
+
+/**
+ * File Attachment Controller: upload file attachment and assoicate to a course
+ */
+Route::post('attachments/upload', 'AttachmentController@store')->name('attachment.upload');
+Route::post('attachments/download', 'AttachmentController@download')->name('attachment.download');
+Route::get('attachments/{id}/enable', 'AttachmentController@enable')->name('attachment.enable');
+Route::get('attachments/{id}/disable', 'AttachmentController@disable')->name('attachment.disable');
 
 /**
  * User Profile
