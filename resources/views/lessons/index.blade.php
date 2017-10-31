@@ -1,11 +1,16 @@
-@if (!($course->active) && !Helper::admin())
+@extends ('layouts.master')
+
+@section ('title', 'Lesson Listing')
+
+@section ('content')
+
+    <h2>{{ $title }}</h2>
+    <hr>
+    <br>
+
+@if (count($lessons) == 0)
     <div class="jumbotron">
-        Course is not active, lesson information will NOT be shown<br>
-        Please contact system administrator !
-    </div>
-@elseif (count($lessons) == 0)
-    <div class="jumbotron">
-        No Class Offering at the moment
+        No Class at the moment
     </div>
 @else   
     <div class="table-responsive">
@@ -13,6 +18,7 @@
             <thead>
                 <tr>
                     <th><center>No.</center></th>
+                    <th>Title</th>
                     <th><center>Venue</center></th>
                     <th><center>Instructor</center></th>
                     <th><center>Language</center></th>
@@ -49,7 +55,8 @@
                     @endif
 
                     <tr>
-                        <td>{{ $course->number }}-{{ sprintf('%02d', $lesson->sequence) }}</td>
+                        <td>{{ $lesson->course->number }}-{{ sprintf('%02d', $lesson->sequence) }}</td>
+                        <td>{{ $lesson->course->title }}</td>
                         <td>
                             @if ($lesson->venue)
                                 <span data-toggle="tooltip" data-placement="top" title="{{ $lesson->venue }}">
@@ -103,4 +110,7 @@
         </table>
     </div>
 
-@endempty {{-- @empty($courses) --}}
+@endempty {{-- @empty($lesson) --}}
+
+
+@endsection

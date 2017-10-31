@@ -26,17 +26,19 @@ class CourseController extends Controller
     {
         if ($request->has('keywords')           // query-string has "keywords"
             && !is_null($keywords = $request->input('keywords'))) { // get query string
-            $courses = Course::with('level')->SearchByKeywords($keywords)->get()->sortBy('number');
+            $courses = Course::with('level')->CoursesSearchByKeywords($keywords)->get();
 
         } else {
                                      // only caching for read-only (index & show)
-            $key = $this->prefix.'CourseWithLevelSortByNumber';
+            $key = $this->prefix.'AllCourses';
             $courses = Cache::remember($key, 5, function() {
-                return Course::with('level')->get()->sortBy('number');
+                return Course::with('level')->get();
             });                     // turn on eager loading
 
             $keywords = 'Search... ';                  // index & search use the same view
         }
+
+        $courses = $courses->sortBy('number');
         return view('courses.index', compact(['courses', 'keywords']));
     }
 

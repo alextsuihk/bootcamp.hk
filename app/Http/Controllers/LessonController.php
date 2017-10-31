@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\LessonStoreUpdate;
+use Carbon\Carbon;
+use App\Lesson;
 use App\Course;
 use App\Level;
-use App\Lesson;
 use App\TeachingLanguage;
 
 
@@ -19,6 +20,57 @@ class LessonController extends Controller
         $this->middleware('auth')->only(['enroll', 'cancel']);
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
         $this->prefix = config('cache.prefix');
+    }
+
+    /**
+     * List lesson
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        // future: first_day > today
+        // new: (now() - updated_at) < 30 days
+        // sortBy = col: course->name, first_day, 
+        // sortOrder = asc/desc
+
+        $key = $this->prefix.'AllLesssons';
+        $lessons = Cache::remember($key, 5, function() {
+            return Lesson::with(['teaching_language','course','course.level'])->where('deleted', false)->get();
+        });  
+
+        if ($request->has('sortBy'))
+        {
+            $sortOrder = ($request->sortOrder == 'desc')?'desc':'asc';
+            $lessons->sortBy($request->sortBy, $request->sortOrder);
+        }
+
+        $title = 'All Class Offerings';
+        $today = date('Y-m-d');
+        if ($request->has('type'))
+        {
+            switch ($request->type)
+            {
+                case 'new':
+                    $lessons = $lessons->where('first_day', '>', $today);
+                    $title = 'New Class Offerings';
+                    break;
+                case 'myCurrentLessons':
+                    $lessons = Lesson::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $today)->where('last_day', '>=', $today)->get();
+                    $title = 'My Active Classes';
+                    break;
+                case 'myFutureLessons':
+                    $lessons = Lesson::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $today)->get();
+                    $title = 'My Enrolled Classes';
+                    break;
+            }
+
+            $lesson = $lessons->sortBy('first_day');
+        }
+        
+        return view('lessons.index', compact(['lessons', 'title']));
+
+
     }
 
     /**
@@ -49,6 +101,9 @@ class LessonController extends Controller
         Cache::forget($key);
 
         $key = 'user_'.Auth::id().'_myFutureLessons';
+        Cache::forget($key);
+
+        $key = $this->prefix.'AllLesssons';
         Cache::forget($key);
 
         $key = $this->prefix.'Course_'.$lesson->course->number;  
@@ -84,6 +139,9 @@ class LessonController extends Controller
         Cache::forget($key);
 
         $key = 'user_'.Auth::id().'_myFutureLessons';
+        Cache::forget($key);
+
+        $key = $this->prefix.'AllLesssons';
         Cache::forget($key);
 
         $key = $this->prefix.'Course_'.$lesson->course->number;  
@@ -141,7 +199,13 @@ class LessonController extends Controller
         ]);
         $lesson->save();
 
+        $key = $this->prefix.'AllLesssons';
+        Cache::forget($key);
+
         $key = $this->prefix.'Course_'.$request->course_number;
+        Cache::forget($key);
+
+        $key = 'newLessons';
         Cache::forget($key);
 
         session()->flash('messageAlertType','alert-success');
@@ -202,6 +266,12 @@ class LessonController extends Controller
         $lesson->remark =  $request->remark;
 
         $lesson->save();
+
+        $key = $this->prefix.'AllLesssons';
+        Cache::forget($key);
+
+        $key = 'newLessons';
+        Cache::forget($key);
 
         $key = $this->prefix.'Course_'. $lesson->course->number;
         Cache::forget($key);

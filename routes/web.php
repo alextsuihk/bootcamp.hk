@@ -33,6 +33,7 @@ Route::get('courses/{course}/{slug?}/{nav?}', 'CourseController@show')->name('co
 /**
  * Lesson Controller
  */
+Route::get('lessons', 'LessonController@index')->name('lessons.index');
 Route::get('lessons/{id}/enroll', 'LessonController@enroll')->name('lessons.enroll');
 Route::get('lessons/{id}/cancel', 'LessonController@cancel')->name('lessons.cancel');
 Route::get('lessons/create/{course_id}', 'LessonController@create')->name('lessons.create');

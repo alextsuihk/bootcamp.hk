@@ -93,5 +93,4 @@ class Lesson extends Model
 
         return $newLessons;
     }
-
 }

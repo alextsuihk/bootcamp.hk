@@ -29,7 +29,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = route('email.sendverify');
+    protected $redirectTo = '/profile/sendemailverify';
 
     /**
      * Create a new controller instance.

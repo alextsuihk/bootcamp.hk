@@ -91,8 +91,8 @@
         </div>
         <hr>
         @include ('lessons.list')
-        @include ('lessons.modal')
-
+        {{-- @include ('lessons.modal')
+        AT-Pending: modal does not make sense, difficult to use helper:old() --}}
     @elseif ($nav=='qna')
         <div class="row">
             <span class="mr-auto ml-3">

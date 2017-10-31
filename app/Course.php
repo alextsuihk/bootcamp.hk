@@ -41,7 +41,7 @@ class Course extends Model
         return $this->belongsTo(Level::class);
     }
 
-    public function scopeSearchByKeywords($query, $keywords)
+    public function scopeCoursesSearchByKeywords($query, $keywords)
     {
         if ($keywords != '') 
         {

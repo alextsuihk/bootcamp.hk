@@ -31,17 +31,19 @@ show My_Question: no of unread answered
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">My Current Classes&nbsp;
+            <a class="nav-link" href="{{ route('lessons.index', ['type'=>'myCurrentLessons']) }}">
+                My Current Classes&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myCurrentLessons }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">My Future Classes&nbsp;
+            <a class="nav-link" href="{{ route('lessons.index', ['type'=>'myFutureLessons']) }}">
+                My Future Classes&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myFutureLessons }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">My GitLab</a>
+            <a class="nav-link" href="http://gitlab.bootcamp.hk/dashboard/projects">My GitLab</a>
         </li>
     </ul>
     <hr>
@@ -52,7 +54,7 @@ show My_Question: no of unread answered
         <span class="nav-link"><strong>Recommendations</strong></span>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">New Courses&nbsp;
+        <a class="nav-link" href="{{ route('lessons.index', ['type'=>'new']) }}">New Classes&nbsp;
             <span class="badge badge-pill badge-info">{{ $newLessons }}</span>
         </a>
     </li>
