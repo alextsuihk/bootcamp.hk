@@ -24,7 +24,7 @@
                         <td>{{ $attachment->filename }}</td>
                         <td>{{ $attachment->description }}</td>
 
-                        <form method="POST" action="/attachments/action">
+                        <form method="POST" action="{{ action('AttachmentController@action') }}">
                             {{ csrf_field() }}
                             <input type="hidden" name="course_number" value="{{ $course->number }}">
                             

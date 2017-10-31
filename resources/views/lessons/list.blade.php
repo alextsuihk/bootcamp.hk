@@ -84,9 +84,9 @@
                         <td><center>
                             @if ($showEnrollButton && !($hideButton))
                                 <a class="" data-toggle="tooltip" data-placement="top" title="Click to enroll" 
-                                href="/lessons/{{ $lesson->id }}/enroll/{{ $course->number }}"><img src="/img/add.png" alt="enroll"></a>
+                                href="{{ route('lessons.enroll', $lesson->id) }}"><img src="/img/add.png" alt="enroll"></a>
                             @elseif ($showCancelButton && !($hideButton))
-                                <a class="" data-toggle="tooltip" data-placement="top" title="Click to cancel enrollment" href="/lessons/{{ $lesson->id }}/cancel/{{ $course->number }}"><img src="/img/remove.png" alt="enroll"></a>
+                                <a class="" data-toggle="tooltip" data-placement="top" title="Click to cancel enrollment" href="{{ route('lessons.cancel', $lesson->id) }}"><img src="/img/remove.png" alt="enroll"></a>
 {{--                                     <button type="submit" class="" data-toggle="tooltip" data-placement="top" title="Click to cancel enrollment">
                                         <img src="/img/remove.png" alt="cancel">
                                     </button> --}}
@@ -95,7 +95,7 @@
                                 Enrolled
                             @endif
                             @if (Helper::admin())
-                                <a class="" href="/lessons/{{ $lesson->id }}/edit">
+                                <a class="" href="{{ route('lessons.edit', $lesson->id) }}">
                                     <img src="/img/edit.png" alt="edit">
                                 </a>
                             @endif

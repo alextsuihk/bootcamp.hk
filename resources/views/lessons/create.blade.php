@@ -44,7 +44,7 @@
     @include ('lessons.form', [ 
         'type'     => 'create',
         'disabled' => '',               // don't disable form-input
-        'action'   => '/lessons/', 
+        'action'   => route('lessons.store'), 
         'method'   => '', 
         'button'   =>'Submit',
         'previousUrl' => route('courses.show',  [$course->number]),

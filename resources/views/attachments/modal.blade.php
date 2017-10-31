@@ -1,7 +1,7 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="uploadNew">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form method="POST" action="/attachments/upload" enctype="multipart/form-data">
+            <form method="POST" action="{{ action('AttachmentController@store') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <input type="hidden" name="course_id" value="{{ $course->id }}">
                 <input type="hidden" name="course_number" value="{{ $course->number }}">
@@ -48,7 +48,7 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="appendMore">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form method="POST" action="/attachments/upload" enctype="multipart/form-data">
+            <form method="POST" action="{{ action('AttachmentController@store') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <input type="hidden" name="course_id" value="{{ $course->id }}">
                 <input type="hidden" name="course_number" value="{{ $course->number }}">

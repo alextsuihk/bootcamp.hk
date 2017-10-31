@@ -26,9 +26,10 @@ class LessonController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function enroll($lesson_id, $course_number)
+    public function enroll($lesson_id)
     {
-        $lesson = Lesson::where('deleted', false)->find($lesson_id);    // get $lesson instance
+        $lesson = Lesson::with('course')->where('deleted', false)->find($lesson_id);    
+                                            // get $lesson instance, if disabled, cannot enroll
         $enrolled = $lesson->users()->where('id', Auth::id())->exists();
 
         if ($enrolled)
@@ -50,10 +51,10 @@ class LessonController extends Controller
         $key = 'user_'.Auth::id().'_myFutureLessons';
         Cache::forget($key);
 
-        $key = $this->prefix.'Course_'.$course_number;  
+        $key = $this->prefix.'Course_'.$lesson->course->number;  
         Cache::forget($key);                // forget this key (course_number), because of nested eager loading
 
-        return redirect()->route('courses.show', [$course_number]);
+        return redirect()->route('courses.show', [$lesson->course->number, str_slug($lesson->course->title), 'lessons']);
     }
 
     /**
@@ -61,9 +62,10 @@ class LessonController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function cancel($lesson_id, $course_number)
+    public function cancel($lesson_id)
     {
-        $lesson = Lesson::where('deleted', false)->find($lesson_id);    // get $lesson instance
+        $lesson = Lesson::with('course')->find($lesson_id);    
+                            // get $lesson instance (even lesson is disabled, still allow cancellation)
         $enrolled = $lesson->users()->where('id', Auth::id())->exists();
 
         if ($enrolled)
@@ -84,10 +86,10 @@ class LessonController extends Controller
         $key = 'user_'.Auth::id().'_myFutureLessons';
         Cache::forget($key);
 
-        $key = $this->prefix.'Course_'.$course_number;  
+        $key = $this->prefix.'Course_'.$lesson->course->number;  
         Cache::forget($key);                // forget this key (course_number), because of nested eager loading
 
-        return redirect()->route('courses.show', [$course_number]);
+        return redirect()->route('courses.show', [$lesson->course->number, str_slug($lesson->course->title), 'lessons']);
     }
 
     /**

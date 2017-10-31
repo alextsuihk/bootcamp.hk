@@ -16,7 +16,7 @@
                 Unknown Reason. Please login and request email verification again
             @endif
             <br><br>
-            <a href="/profile" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">
+            <a href="{{ route('profile.edit') }}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">
             Resend Verification Email</a>
         </center>
     </div>

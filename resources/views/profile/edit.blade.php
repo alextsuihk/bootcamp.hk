@@ -8,7 +8,7 @@
     @include ('profile.form', [
         'type'     => 'edit',
         'disabled' => '',           // don't disable form-input
-        'action'=> "/profile/$user->id", 
+        'action'=> action('ProfileController@update', $user->id), 
         'method'=> "", 
         'button'=> 'Submit',
         ]) 

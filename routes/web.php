@@ -33,8 +33,8 @@ Route::get('courses/{course}/{slug?}/{nav?}', 'CourseController@show')->name('co
 /**
  * Lesson Controller
  */
-Route::get('lessons/{id}/enroll/{course}', 'LessonController@enroll')->name('lessons.enroll');
-Route::get('lessons/{id}/cancel/{course}', 'LessonController@cancel')->name('lessons.cancel');
+Route::get('lessons/{id}/enroll', 'LessonController@enroll')->name('lessons.enroll');
+Route::get('lessons/{id}/cancel', 'LessonController@cancel')->name('lessons.cancel');
 Route::get('lessons/create/{course_id}', 'LessonController@create')->name('lessons.create');
 Route::post('lessons/', 'LessonController@store')->name('lessons.store');
 Route::get('lessons/{id}/edit', 'LessonController@edit')->name('lessons.edit');
@@ -53,10 +53,10 @@ Route::post('attachments/action', 'AttachmentController@action')->name('attachme
  */
 Route::get('profile/sendemailverify', 'ProfileController@sendemailverify')->name('email.sendverify'); 
 Route::get('profile/{id?}', 'ProfileController@edit')->name('profile.edit'); 
-Route::post('profile/{id?}', 'ProfileController@update');
+Route::post('profile/{id?}', 'ProfileController@update')->name('profile.update');
 Route::get('email/verify/{token}', 'ProfileController@emailverify')->name('email.verify');
-Route::get('password/change', 'Auth\ChangePasswordController@edit');
-Route::post('password/change', 'Auth\ChangePasswordController@update');
+Route::get('password/change', 'Auth\ChangePasswordController@edit')->name('password.edit');
+Route::post('password/change', 'Auth\ChangePasswordController@update')->name('password.update');
 //Route::get('')
 Auth::routes();
 

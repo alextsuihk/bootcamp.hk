@@ -53,10 +53,10 @@ class ProfileController extends Controller
 
             // Flush message back
             session()->flash('messageAlertType','alert-warning');
-            session()->flash('message','Verification email is sent to you, please check mailbox');
+            session()->flash('message','Verification email is sent to you, please check mailbox. Please also check SPAM box');
         }
 
-        return redirect('/profile');
+        return redirect()->route('profile.edit');
     }
 
     /**
@@ -67,7 +67,6 @@ class ProfileController extends Controller
      */
     public function emailverify($token)
     {
-        
         $user = User::where('email_token', '=', $token)->first();
 
         if (count($user) ==0)
@@ -75,7 +74,8 @@ class ProfileController extends Controller
             return view('profile.email_verify_fail', ['result' => 'nomatch']);
         } 
 
-        $expireInMinutes = config('email_verify_expire');
+        $expireInMinutes = config('mail.email_verify_expire');
+
         if (($user->email_token_created_at->diffInMinutes(now())) > $expireInMinutes) 
         {      // check if token is more than 60 mins
             return view('profile.email_verify_fail', ['result' => 'expired']);
@@ -93,7 +93,7 @@ class ProfileController extends Controller
             $user->save();
             session()->flash('messageAlertType','alert-success');
             session()->flash('message','Thank You, your email is verified');
-            return redirect('/profile');
+            return redirect()->route('profile.edit');
         }
         
     }
@@ -141,7 +141,7 @@ class ProfileController extends Controller
 
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','User profile is updated');
-        return redirect('/profile');
+        return redirect()->route('profile.edit');
 
     }
 

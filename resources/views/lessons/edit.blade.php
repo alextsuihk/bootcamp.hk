@@ -43,7 +43,7 @@
     @include ('lessons.form', [ 
         'type'     => 'edit',
         'disabled' => '',               // don't disable form-input
-        'action'   => '/lessons/'.$edit->id, 
+        'action'   => route('lessons.update', $edit->id),
         'method'=> method_field('PATCH'), 
         'button'   =>'Submit',
         'previousUrl' => url()->previous(),

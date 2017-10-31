@@ -67,6 +67,6 @@ class ChangePasswordController extends Controller
 
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','New password is accepted');
-        return redirect('/profile');
+        return redirect()->route('profile.edit');
     }
 }

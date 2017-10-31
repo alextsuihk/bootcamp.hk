@@ -76,8 +76,8 @@
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown_login">
                         <a class="dropdown-item disabled" href="#">My Class</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/profile">Profile</a>
-                        <a class="dropdown-item" href="/password/change">Change Password</a>
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a>
+                        <a class="dropdown-item" href="{{ route('password.edit') }}">Change Password</a>
                         <div class="dropdown-divider"></div>  
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();

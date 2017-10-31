@@ -39,5 +39,8 @@
         </form>
 
         A password reset link will be sent to your mailbox.
+        <p class="text-danger">
+            <strong>Please also check the SPAM box as the email is mistakenly filtered </strong>
+        </p>
 
 @endsection
