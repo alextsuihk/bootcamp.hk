@@ -83,7 +83,7 @@ class AttachmentController extends Controller
     }
 
     /**
-     * Disable in table file_revision.
+     * Download, Enable & Disable a file (attachment_revision) for download
      *
      * @return \Illuminate\Http\Response
      */
@@ -92,13 +92,46 @@ class AttachmentController extends Controller
         switch($request->action)
         {
             case "download": 
-                $this->download($request);
+                $id = $request->revision_id;
+                $file = AttachmentRevision::with('attachment')->find($id);
+
+                if ($file->disabled && !Helper::admin())
+                {
+                    session()->flash('messageAlertType','alert-warning');
+                    session()->flash('message','This revision is disabled, please download other versions');
+                    return redirect()->back();
+                } else {
+                    $content = storage_path('app/'.$file->path);
+                    $headers = array(       // AT-Pending: it works without headers, just following the Laravel document
+                                  'Content-Type: application/'.$file->attachment->extension,
+                                );
+                    return  response()->download($content, $file->attachment->filename, $headers);
+                }
                 break;
             case "enable":
-                $this->enable($request);
-                break;
+                $id = $request->revision_id;
+                $file = AttachmentRevision::with('attachment')->find($id);
+                $file->disabled = false;
+                $file->save();
+
+                $key = $this->prefix.'Course_'.$request->course_number;  
+                Cache::forget($key);                // forget this key (course_number)
+
+                session()->flash('messageAlertType','alert-info');
+                session()->flash('message','File is enabled for downloading');
+                return redirect()->back();
             case "disable":
-                $this->disable($request);
+                $id = $request->revision_id;
+                $file = AttachmentRevision::with('attachment')->find($id);
+                $file->disabled = true;
+                $file->save();
+
+                $key = $this->prefix.'Course_'.$request->course_number;  
+                Cache::forget($key);                // forget this key (course_number)
+
+                session()->flash('messageAlertType','alert-warning');
+                session()->flash('message','File is disabled for downloading');
+                return redirect()->back();
                 break;
             default:
                 session()->flash('messageAlertType','alert-warning');
@@ -107,70 +140,6 @@ class AttachmentController extends Controller
         }
         return redirect()->back();
 
-    }
-
-    /**
-     * Download a particular file revision.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function download(Request $request)
-    {
-        $id = $request->revision_id;
-        $file = AttachmentRevision::with('attachment')->find($id);
-
-        if ($file->disabled && !Helper::admin())
-        {
-            session()->flash('messageAlertType','alert-warning');
-            session()->flash('message','This revision is disabled, please download other version');
-            return redirect()->back();
-        } else {
-            $content = storage_path('app/'.$file->path);
-            $headers = array(       // AT-Pending: it works without headers, just following the Laravel document
-                          'Content-Type: application/'.$file->attachment->extension,
-                        );
-            return  response()->download($content, $file->attachment->filename, $headers);
-        }
-    }
-
-    /**
-     * enable in table attachment_revision.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function enable(Request $request)
-    {
-        $id = $request->revision_id;
-        $file = AttachmentRevision::with('attachment')->find($id);
-        $file->disabled = false;
-        $file->save();
-
-        $key = $this->prefix.'Course_'.$request->course_number;  
-        Cache::forget($key);                // forget this key (course_number)
-        
-        session()->flash('messageAlertType','alert-info');
-        session()->flash('message','File is enabled for downloading');
-        return redirect()->back();
-    }
-
-    /**
-     * Disable in table attachment_revision.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function disable(Request $request)
-    {
-        $id = $request->revision_id;
-        $file = AttachmentRevision::with('attachment')->find($id);
-        $file->disabled = true;
-        $file->save();
-
-        $key = $this->prefix.'Course_'.$request->course_number;  
-        Cache::forget($key);                // forget this key (course_number)
-
-        session()->flash('messageAlertType','alert-warning');
-        session()->flash('message','File is disabled for downloading');
-        return redirect()->back();
     }
 
 }

@@ -11,10 +11,10 @@
     <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="{{ route('home') }}">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/courses">Courses</a>
+                <a class="nav-link" href="{{ route('courses.index') }}">Courses</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="dropdown_questions" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Questions</a>

@@ -16,11 +16,11 @@
     <div class="row">
         <span class="mr-auto ml-3"><h2>Course Detail</h2></span>
         <span class="ml-auto mr-5">
-            <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
-            <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
+            remove-them
+            <a href="{{ route('courses.like', $course->number) }}"><img src="/img/thumbs-up.png" alt="like"></a>
+            <a class="btn btn-primary" href="{{ route('courses.follow', $course->number) }}">Follow</a>
             @if (Helper::admin())
-                <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="/courses/{{ $course->number }}/edit">
-                    <img src="/img/edit.png" alt="Edit"></a>
+                <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="{{ 'courses.edit', $course->number }}"><img src="/img/edit.png" alt="Edit"></a>
             @endif
         </span>
     </div>
@@ -34,13 +34,13 @@
         'button'   => '',
         'cancel'   => route('courses.show',  [$course->number]), 
         ]) 
-    {{-- need to use relative link to work, https vs http issue --}}
-                            
+
+    <hr>
+    <h2 id="lessonOffering">Lesson Offerings</h2>                    
     @include ('lessons.list')
     
     <hr>
-    
-    <h3 id="lessonSection">Adding a Lesson</h3>
+    <h2 id="lessonSection">Adding a Lesson</h2>
     @include ('lessons.form', [ 
         'type'     => 'create',
         'disabled' => '',               // don't disable form-input

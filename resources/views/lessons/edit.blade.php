@@ -16,11 +16,10 @@
     <div class="row">
         <span class="mr-auto"><h2>Course Detail</h2></span>
         <span class="ml-auto mr-5">
-            <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
-            <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
+            <a class="" href="{{ route('courses.like', $course->id) }}"><img src="/img/thumbs-up.png" alt="like"></a>
+            <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}">Follow</a>
             @if (Helper::admin())
-                <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="/courses/{{ $course->number }}/edit">
-                    <img src="/img/edit.png" alt="Edit"></a>
+                <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="{{ route('courses.edit', $course->number) }}"><img src="/img/edit.png" alt="Edit"></a>
             @endif
         </span>
     </div>

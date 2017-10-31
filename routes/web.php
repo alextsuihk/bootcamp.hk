@@ -26,24 +26,26 @@ Route::view('contactus', 'pages/contactus');
 Route::resource('courses', 'CourseController', ['only' =>[
     'index','create','store', 'edit','update'
 ]]);
-Route::get('courses/{course}/{slug?}', 'CourseController@show')->name('courses.show');
+Route::get('courses/{id}/like', 'CourseController@like')->name('courses.like');
+Route::get('courses/{id}/follow', 'CourseController@follow')->name('courses.follow');
+Route::get('courses/{course}/{slug?}/{nav?}', 'CourseController@show')->name('courses.show');
 
 /**
  * Lesson Controller
  */
-Route::get('lessons/{id}/enroll/{course}', 'LessonController@enroll')->name('lesson.enroll');
-Route::get('lessons/{id}/cancel/{course}', 'LessonController@cancel')->name('lesson.cancel');
-Route::get('lessons/create/{course_id}', 'LessonController@create')->name('lesson.create');
-Route::post('lessons/', 'LessonController@store')->name('lesson.store');
-Route::get('lessons/{id}/edit', 'LessonController@edit')->name('lesson.edit');
-Route::patch('lessons/{id}', 'LessonController@update')->name('lesson.update');
+Route::get('lessons/{id}/enroll/{course}', 'LessonController@enroll')->name('lessons.enroll');
+Route::get('lessons/{id}/cancel/{course}', 'LessonController@cancel')->name('lessons.cancel');
+Route::get('lessons/create/{course_id}', 'LessonController@create')->name('lessons.create');
+Route::post('lessons/', 'LessonController@store')->name('lessons.store');
+Route::get('lessons/{id}/edit', 'LessonController@edit')->name('lessons.edit');
+Route::patch('lessons/{id}', 'LessonController@update')->name('lessons.update');
 
 
 /**
  * File Attachment Controller: upload file attachment and assoicate to a course
  */
-Route::post('attachments/upload', 'AttachmentController@store')->name('attachment.upload');
-Route::post('attachments/action', 'AttachmentController@action')->name('attachment.action');  
+Route::post('attachments/upload', 'AttachmentController@store')->name('attachments.upload');
+Route::post('attachments/action', 'AttachmentController@action')->name('attachments.action');  
                                                         //download, enable & disable
 
 /**

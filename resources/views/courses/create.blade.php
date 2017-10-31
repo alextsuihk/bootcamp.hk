@@ -13,11 +13,9 @@
         'type'     => 'create',
         'disabled' => '',               // don't disable form-input
         'course_num_readonly' => '',    // course_num is not changeable AFTER creation
-        'action'   => '/courses', 
+        'action'   => action('CourseController@store'), 
         'method'   => '', 
         'button'   =>'Submit',
         'cancel'   => route('courses.index'), 
         ])
 @endsection
-
-{{-- 'action'=>action('CourseController@store'), --}}

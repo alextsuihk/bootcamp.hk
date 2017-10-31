@@ -6,23 +6,20 @@
 
     <h2>Course Listing</h2>
     <hr>
-    {{-- AT-Pending: future search box --}}
     <div class="row">
         <span class="mr-auto ml-3">
-            <form method="GET" action="/courses" class="form-inline">
+            <form method="GET" action={{ route('courses.index') }} class="form-inline">
                 {{ csrf_field() }}
                 <input class="form-control " type="search" id="keywords" name="keywords" placeholder="{{ $keywords }}" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
         </span>
 
-        @auth 
-            @if (Helper::admin())
-                <span class="ml-auto mr-3">
-                    <a class="btn btn-primary" href="/courses/create">Add Course</a>
-                </span>
-            @endif
-        @endauth
+        @if (Helper::admin())
+            <span class="ml-auto mr-3">
+                <a class="btn btn-primary" href="{{ route('courses.create') }}">Add Course</a>
+            </span>
+        @endif
     </div>
         
     <br>
@@ -48,9 +45,11 @@
                         @if (!($course->deleted) || Helper::admin() )
                             <tr>
                                 @if ($course->active)
-                                    <td><a href="/courses/{{ $course->number }}"><strong>{{ $course->number }}</strong></a></td>
+                                    <td><a href="{{ route('courses.show', $course->number) }}"><strong>
+                                        {{ $course->number }}</strong></a></td>
                                 @else
-                                    <td><a href="/courses/{{ $course->number }}">{{ $course->number }}</a></td>
+                                    <td><a href="{{ route('courses.show', $course->number) }}">
+                                        {{ $course->number }}</a></td>
                                 @endif
                                 <td><strong>{{ str_limit($course->title, 40, ' ...') }} </strong></td>
                                 <td>{{ $course->level->difficulty }}</td>
@@ -64,9 +63,12 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a class="" data-toggle="tooltip" data-placement="top" title="View detail" href="/courses/{{ $course->number }}"><img src="/img/info.png" alt="Info"></a> 
+                                    <a class="" data-toggle="tooltip" data-placement="top" title="View detail" 
+                                    href="{{ route('courses.show', $course->number) }}">
+                                    <img src="/img/info.png" alt="Info"></a> 
                                     @if (Helper::admin())
-                                        <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="/courses/{{ $course->number }}/edit">
+                                        <a class="" data-toggle="tooltip" data-placement="top" title="Edit" 
+                                        href="{{ route('courses.edit', $course->number) }}">
                                             <img src="/img/edit.png" alt="Edit"></a>
                                     @endif
                                 </td>

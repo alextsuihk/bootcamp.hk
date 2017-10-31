@@ -35,7 +35,7 @@ class CourseController extends Controller
                 return Course::with('level')->get()->sortBy('number');
             });                     // turn on eager loading
 
-            $keywords = 'Search... (placeholder)';                  // index & search use the same view
+            $keywords = 'Search... ';                  // index & search use the same view
         }
         return view('courses.index', compact(['courses', 'keywords']));
     }
@@ -93,7 +93,7 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($number, $slug = null)
+    public function show($number, $slug = null, $nav='overview')
     {
         // only cache & eager loading Course & Lession
         // user enrollment will be using lazy loading
@@ -118,14 +118,16 @@ class CourseController extends Controller
         if (!($slug))
         {
             $slug = str_slug($course->title);
-            $url = '/courses/'.$number.'/'.$slug;
+            $url = route('courses.show', [$number, $slug, $nav]);
             request()->session()->reflash();         // flush again before redirect, otherwise message is lost
             return redirect($url); 
         }
 
         $lessons = $course->lessons->sortbyDesc('first_day');       // sortBy first_day DESC
         $attachments = $course->attachments;
-        return view('courses.show', compact(['course', 'lessons', 'attachments']));
+
+        $tab = 'overview';
+        return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav']));
     }
     /**
      * Show the form for editing the specified resource.
@@ -166,10 +168,12 @@ class CourseController extends Controller
         $key = $this->prefix.'Course_'.$course->number;  
         Cache::forget($key);                // forget this key (course_number)
 
+        $key = $this->prefix.'CourseWithLevelSortByNumber';
+        Cache::forget($key);        // flush this key for courses.index
+
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','Course detail is updated');
         return redirect()->route('courses.show', $course->number);
-        //return redirect()->action('CourseController@show', ['course' => $course->number]);
     }
 
     /**
@@ -181,5 +185,27 @@ class CourseController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * TBD
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function like($id)
+    {
+        die('user likes this course');
+    }
+
+    /**
+     * TBD
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function follow($id)
+    {
+        die('user follows this course, and receive notfication whenever there is an update or a new question (assoicated with this course) is posted');
     }
 }

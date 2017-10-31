@@ -43,7 +43,7 @@
                             <td><center>
                                 <button type="submit" name="action" value="download" class="btn btn-primary">Download</button>
                                 @if (Helper::admin())
-                                    <button id="appendMoreModal" type="button" class="btn btn-primary" data-toggle="modal" data-target="#appendMore" data-id="{{ $attachment->id }}">Update Revision</button>
+                                    <button id="appendMoreModal" type="button" class="btn btn-primary" data-toggle="modal" data-target="#appendMore" data-id="{{ $attachment->id }}">Update Revision</button><br>
                                     <button type="submit" name="action" value="enable" class="btn btn-primary">Enable</button>
                                     <button type="submit" name="action" value="disable" class="btn btn-primary">Disable</button>
                                 @endif

@@ -130,8 +130,8 @@
     <div class="form-group">
         @if ($type == 'show')
             <a class="btn btn-primary" href="{{ route('courses.index') }}">Home</a>
-            <a class="" href="/course/{{ $course->number }}/like"><img src="/img/thumbs-up.png" alt="like"></a>
-            <a class="btn btn-primary" href="/course/{{ $course->number }}/follow">Follow</a>
+            <a class="" href="{{ route('courses.like', [$course->id]) }}"><img src="/img/thumbs-up.png" alt="like"></a>
+            <a class="btn btn-primary" title="notify you when there is an update and new question is posted" href="{{ route('courses.follow', [$course->id]) }}">Follow</a>
         @else
             <button type="submit" class="btn btn-primary">{{ $button }}</button>
             <a class="btn btn-secondary" href="{{ $cancel }}">Cancel</a>
