@@ -72,7 +72,9 @@ Route::post('profile/{id?}', 'ProfileController@update')->name('profile.update')
 Route::get('email/verify/{token}', 'ProfileController@emailverify')->name('email.verify');
 Route::get('password/change', 'Auth\ChangePasswordController@edit')->name('password.edit');
 Route::post('password/change', 'Auth\ChangePasswordController@update')->name('password.update');
-//Route::get('')
+Route::get('auth/facebook', 'Auth\LoginController@redirectToProvider');
+Route::get('auth/facebook/callback', 'Auth\LoginController@handleProviderCallback');
+Route::redirect('logout', '/');
 Auth::routes();
 
 

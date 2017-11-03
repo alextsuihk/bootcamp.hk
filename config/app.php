@@ -177,6 +177,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
     ],
 
     /*
@@ -227,7 +228,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Helper' => App\Helpers\Helper::class,                  // custom helper
         'Debugbar' => Barryvdh\Debugbar\Facade::class,          // Laravel Debugbar
-
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,  // OAuth2 (login with Facebook)
 
     ],
 
