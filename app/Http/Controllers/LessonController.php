@@ -27,47 +27,49 @@ class LessonController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $type=null)
     {
-        // future: first_day > today
-        // new: (now() - updated_at) < 30 days
-        // sortBy = col: course->name, first_day, 
-        // sortOrder = asc/desc
-
         $key = $this->prefix.'AllLesssons';
         $lessons = Cache::remember($key, 5, function() {
-            return Lesson::with(['teaching_language','course','course.level'])->where('deleted', false)->get();
-        });  
-
-        if ($request->has('sortBy'))
-        {
-            $sortOrder = ($request->sortOrder == 'desc')?'desc':'asc';
-            $lessons->sortBy($request->sortBy, $request->sortOrder);
-        }
-
+            return Lesson::with(['teaching_language','course','course.level', 'users'])
+            ->where('deleted', false)->get()->sortBy('first_day');
+        });
         $title = 'All Class Offerings';
+
         $today = date('Y-m-d');
-        if ($request->has('type'))
+        if ($type != null)
         {
-            switch ($request->type)
+            switch ($type)
             {
                 case 'new':
                     $lessons = $lessons->where('first_day', '>', $today);
                     $title = 'New Class Offerings';
                     break;
                 case 'myCurrentLessons':
-                    $lessons = Lesson::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $today)->where('last_day', '>=', $today)->get();
+                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $today)->where('last_day', '>=', $today)->get();
                     $title = 'My Active Classes';
                     break;
                 case 'myFutureLessons':
-                    $lessons = Lesson::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $today)->get();
+                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $today)->get();
                     $title = 'My Enrolled Classes';
                     break;
             }
-
-            $lesson = $lessons->sortBy('first_day');
         }
-        
+
+
+        if ($request->has('sortBy'))
+        {
+            if ($request->sortOrder == 'desc')
+            {
+                $lessons = $lessons->sortByDesc($request->sortBy);
+            } else {
+                $lessons = $lessons->sortBy($request->sortBy);
+            }
+
+        } else {
+            $lessons = $lessons->sortBy('first_day');
+        }
+
         return view('lessons.index', compact(['lessons', 'title']));
 
 
@@ -86,9 +88,8 @@ class LessonController extends Controller
 
         if ($enrolled)
         {
-            // should never come here
             session()->flash('messageAlertType','alert-warning');
-            session()->flash('message','Something is wrong, please contact system admin');
+            session()->flash('message','You have enrolled previously. See you in the class');
             // if requesting to enroll & not yet enrolled
         } else {
             $lesson->users()->attach(Auth::id(), ['enrolled_at' => now()]);
@@ -109,7 +110,7 @@ class LessonController extends Controller
         $key = $this->prefix.'Course_'.$lesson->course->number;  
         Cache::forget($key);                // forget this key (course_number), because of nested eager loading
 
-        return redirect()->route('courses.show', [$lesson->course->number, str_slug($lesson->course->title), 'lessons']);
+        return redirect()->back();
     }
 
     /**
@@ -147,7 +148,7 @@ class LessonController extends Controller
         $key = $this->prefix.'Course_'.$lesson->course->number;  
         Cache::forget($key);                // forget this key (course_number), because of nested eager loading
 
-        return redirect()->route('courses.show', [$lesson->course->number, str_slug($lesson->course->title), 'lessons']);
+        return redirect()->back();
     }
 
     /**
@@ -180,7 +181,7 @@ class LessonController extends Controller
      */
     public function store(LessonStoreUpdate $request)
     {
-        $max = Lesson::where('course_id', '=', $request->course_id)->pluck('sequence')->max();
+        $max = Lesson::with('course')->where('course_id', '=', $request->course_id)->pluck('sequence')->max();
                         // get the last sequence# from lesson table (where course_id)
 
         $lesson = Lesson::create([ 
@@ -202,7 +203,7 @@ class LessonController extends Controller
         $key = $this->prefix.'AllLesssons';
         Cache::forget($key);
 
-        $key = $this->prefix.'Course_'.$request->course_number;
+        $key = $this->prefix.'Course_'.$lesson->course->number;
         Cache::forget($key);
 
         $key = 'newLessons';
@@ -211,7 +212,9 @@ class LessonController extends Controller
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','A new lesson is added');
 
-        return redirect()->route('courses.show', [$request->course_number]);
+        return redirect()->route('courses.show', 
+            [$lesson->course->number, str_slug($lesson->course->title), 'lessons']);
+
     }
 
     /**
@@ -278,7 +281,9 @@ class LessonController extends Controller
 
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','Course detail is updated');
-        return redirect()->route('courses.show', $lesson->course->number);
+
+        return redirect()->route('courses.show', 
+            [$lesson->course->number, str_slug($lesson->course->title), 'lessons']);
     }
 
     /**

@@ -18,7 +18,7 @@ class CreateAttachmentRevisionsTable extends Migration
             $table->integer('attachment_id')->unsigned()->index();
             $table->foreign('attachment_id')->references('id')->on('attachments');
             $table->string('path');
-            $table->integer('revision')->unsigned()->default(0)->index();
+            $table->integer('revision')->unsigned()->default(0);
             $table->boolean('disabled')->default(false);
             $table->timestamps();
         });

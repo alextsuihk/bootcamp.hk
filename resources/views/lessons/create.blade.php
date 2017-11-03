@@ -7,21 +7,9 @@
 @endphp
 
 @section ('content')
-    <script type="text/javascript">             // AT-Pending: scrollIntoView not working
-        $(document).ready(function() {
-            document.getElementById('lessonSection').scrollIntoView();
-        }
-    </script>
-
     <div class="row">
         <span class="mr-auto ml-3"><h2>Course Detail</h2></span>
         <span class="ml-auto mr-5">
-            remove-them
-            <a href="{{ route('courses.like', $course->number) }}"><img src="/img/thumbs-up.png" alt="like"></a>
-            <a class="btn btn-primary" href="{{ route('courses.follow', $course->number) }}">Follow</a>
-            @if (Helper::admin())
-                <a class="" data-toggle="tooltip" data-placement="top" title="Edit" href="{{ 'courses.edit', $course->number }}"><img src="/img/edit.png" alt="Edit"></a>
-            @endif
         </span>
     </div>
     <hr>
@@ -49,5 +37,9 @@
         'button'   =>'Submit',
         'previousUrl' => route('courses.show',  [$course->number]),
         ]) 
+
+    <script>
+        document.getElementById('lessonSection').scrollIntoView();
+    </script>
 
 @endsection

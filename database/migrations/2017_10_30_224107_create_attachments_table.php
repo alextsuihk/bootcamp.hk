@@ -17,7 +17,7 @@ class CreateAttachmentsTable extends Migration
             $table->increments('id');
             $table->integer('course_id')->unsigned()->index();
             $table->foreign('course_id')->references('id')->on('courses');
-            $table->string('filename', 30)->index();
+            $table->string('filename', 30);
             $table->string('extension',10);
             $table->string('description')->nullable();
             $table->timestamps();

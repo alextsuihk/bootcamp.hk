@@ -30,7 +30,6 @@ class Course extends Model
         return $this->hasMany(Attachment::class);
     }
 
-
     /**
      * Course belongs to a (difficulty) level
      *
@@ -41,7 +40,22 @@ class Course extends Model
         return $this->belongsTo(Level::class);
     }
 
-    public function scopeCoursesSearchByKeywords($query, $keywords)
+    /**
+     * Course has many questions
+     *
+     * @return mixed
+     */
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    /**
+     * query scope for searching multiple keyword(s)
+     *
+     * @return mixed
+     */
+    public function scopeCourseSearchByKeywords($query, $keywords)
     {
         if ($keywords != '') 
         {

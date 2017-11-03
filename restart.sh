@@ -7,5 +7,5 @@ php artisan migrate:fresh --seed
 #php artisan db:seed --class=UsersTableSeeder
 #php artisan db:seed --class=LevelsTableSeeder
 
-sudo rm -rf  storage/app/files/*
+#####sudo rm -rf  storage/app/files/*
 

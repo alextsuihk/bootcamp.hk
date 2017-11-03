@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
@@ -32,5 +34,16 @@ class User extends Authenticatable
     public function lessons()
     {
         return $this->belongsToMany(Lesson::class);
+    }
+
+
+    public static function getNewUsers()
+    {
+        $key = 'newUser';  
+        $myQuestions = Cache::remember($key, 60, function() {
+            return static::where('created_at', '>', Carbon::now()->subDays(14) )->count();
+        });
+
+        return $myQuestions;
     }
 }

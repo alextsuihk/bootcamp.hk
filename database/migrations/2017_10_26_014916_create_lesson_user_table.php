@@ -15,9 +15,9 @@ class CreateLessonUserTable extends Migration
     {
         Schema::create('lesson_user', function (Blueprint $table) {
             //$table->increments('id');         // must comment out this line, this is also a primary by default
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('lesson_id')->unsigned();
+            $table->integer('lesson_id')->unsigned()->index();
             $table->foreign('lesson_id')->references('id')->on('lessons');
             $table->timestamp('enrolled_at');
             $table->primary(['user_id', 'lesson_id']);   // combined unique

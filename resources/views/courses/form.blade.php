@@ -2,9 +2,7 @@
     {{ csrf_field() }}
     {{ $method }}       {{-- needed in case of update [PATCH] which is not supported by most browsers today --}}
                         {{-- we also add a custom helper in \app\Helpers\Helper.php  --}}
-
-{{-- AT-Pending: no need to pass course->id,we are using course-number as reference
-    <input type="hidden" name="course_id" value="{{ $course->id }}" /> --}}
+                        
     <div class="form-group">
         <label class="col-form-label form-label" for="title">Course Number:</label>
         <input type="text" class="col-1 form-control" id="number" name="number" 
@@ -130,8 +128,6 @@
     <div class="form-group">
         @if ($type == 'show')
             <a class="btn btn-primary" href="{{ route('courses.index') }}">Home</a>
-            <a class="" href="{{ route('courses.like', [$course->id]) }}"><img src="/img/thumbs-up.png" alt="like"></a>
-            <a class="btn btn-primary" title="notify you when there is an update and new question is posted" href="{{ route('courses.follow', [$course->id]) }}">Follow</a>
         @else
             <button type="submit" class="btn btn-primary">{{ $button }}</button>
             <a class="btn btn-secondary" href="{{ $cancel }}">Cancel</a>

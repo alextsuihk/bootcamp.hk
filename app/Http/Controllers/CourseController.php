@@ -8,6 +8,7 @@ use App\Http\Requests\CourseStoreUpdate;
 use App\Course;
 use App\Level;
 use App\Lesson;
+use App\Question;
 
 class CourseController extends Controller
 {
@@ -26,7 +27,7 @@ class CourseController extends Controller
     {
         if ($request->has('keywords')           // query-string has "keywords"
             && !is_null($keywords = $request->input('keywords'))) { // get query string
-            $courses = Course::with('level')->CoursesSearchByKeywords($keywords)->get();
+            $courses = Course::with('level')->CourseSearchByKeywords($keywords)->get();
 
         } else {
                                      // only caching for read-only (index & show)
@@ -81,7 +82,7 @@ class CourseController extends Controller
             'remark' => $request->remark,
         ]);
 
-        $key = $this->prefix.'CourseWithLevelSortByNumber';
+        $key = $this->prefix.'AllCourses';
         Cache::forget($key);        // flush 'courses' cache (no need to wait to expire)
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','A new course is added');
@@ -128,8 +129,13 @@ class CourseController extends Controller
         $lessons = $course->lessons->sortbyDesc('first_day');       // sortBy first_day DESC
         $attachments = $course->attachments;
 
+        // get questions list 
+        $questions = Question::getEverything()->where('course_id', $course->id);
+        $questions = Question::getLastModifiedAt($questions);
+        $questions = $questions->sortByDesc('last_modified_at');
+
         $tab = 'overview';
-        return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav']));
+        return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav', 'questions']));
     }
     /**
      * Show the form for editing the specified resource.
@@ -170,24 +176,14 @@ class CourseController extends Controller
         $key = $this->prefix.'Course_'.$course->number;  
         Cache::forget($key);                // forget this key (course_number)
 
-        $key = $this->prefix.'CourseWithLevelSortByNumber';
-        Cache::forget($key);        // flush this key for courses.index
+        $key = $this->prefix.'AllCourses';
+        Cache::forget($key);        // flush 'courses' cache (no need to wait to expire)
 
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','Course detail is updated');
         return redirect()->route('courses.show', $course->number);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 
     /**
      * TBD
@@ -197,7 +193,9 @@ class CourseController extends Controller
      */
     public function like($id)
     {
-        die('user likes this course');
+        session()->flash('messageAlertType','alert-warning');
+        session()->flash('message','Feature is not yet implemented, please try later');
+        return redirect()->back();
     }
 
     /**
@@ -208,6 +206,8 @@ class CourseController extends Controller
      */
     public function follow($id)
     {
-        die('user follows this course, and receive notfication whenever there is an update or a new question (assoicated with this course) is posted');
+        session()->flash('messageAlertType','alert-warning');
+        session()->flash('message','Feature is not yet implemented, please try later');
+        return redirect()->back();
     }
 }

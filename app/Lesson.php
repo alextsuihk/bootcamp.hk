@@ -93,4 +93,19 @@ class Lesson extends Model
 
         return $newLessons;
     }
+
+    /**
+     * Get all lessons counts
+     *
+     * @return mixed
+     */
+    public static function getAllLessons()
+    {
+        $key = 'allLessons';   
+        $newLessons = Cache::remember($key, 5, function() {
+            return static::all()->count();
+        });
+
+        return $newLessons;
+    }
 }

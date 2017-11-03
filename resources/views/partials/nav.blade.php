@@ -16,13 +16,8 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('courses.index') }}">Courses</a>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="dropdown_questions" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Questions</a>
-                <div class="dropdown-menu" aria-labelledby="dropdown_questions">
-                    <a class="dropdown-item" href="#">Instruction</a>
-                    <a class="dropdown-item" href="#">Ask Question</a>
-                    <a class="dropdown-item" href="#">Search Answer</a>
-                </div>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('questions.index') }}">Q&amp;A</a>
             </li>
 
 {{--             <li class="nav-item dropdown">
@@ -46,13 +41,13 @@
 
         {{-- AT-Pending: make search box expandable --}}
         {{-- https://stackoverflow.com/questions/34124050/how-to-expand-input-field-to-the-right-in-a-header-bar --}}
-        <div class="d-none d-lg-block d-lg-none">
+{{--         <div class="d-none d-lg-block d-lg-none">
             <form action="#" class="form-inline my-2 my-lg-0">
                 {{ csrf_field() }}
                 <input class="form-control mr-sm-2" type="search" id="keyword" name="keyword" placeholder="Search... (make it expandable)" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><img src="/img/search.png" width="24" alt="search"></button>
             </form>
-        </div>
+        </div> --}}
 
         <!-- Right Side Of Navbar -->
         <ul class="navbar-nav ml-auto">

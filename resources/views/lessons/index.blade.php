@@ -13,6 +13,13 @@
         No Class at the moment
     </div>
 @else   
+
+    <div>
+        Sort By:
+        <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=course.title' }}">Title</a>
+        <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=first_day' }}">First Day</a>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -30,7 +37,7 @@
             </thead>
             <tbody>
                 @foreach ($lessons as $lesson)
-
+                     <?php $uri = route('courses.show', [$lesson->course->number, str_slug($lesson->course->title)]); ?>
                     @if (Auth::check() && $lesson->users->keyBy('id')->contains(Auth::id()))
                         <?php $showCancelButton = true; ?>             {{-- if logged-in && enrolled --}}
                         <?php $showEnrollButton = false; ?>
@@ -55,8 +62,8 @@
                     @endif
 
                     <tr>
-                        <td>{{ $lesson->course->number }}-{{ sprintf('%02d', $lesson->sequence) }}</td>
-                        <td>{{ $lesson->course->title }}</td>
+                        <td><a class="" href="{{ $uri }}/overview">{{ $lesson->course->number }}</a>-{{ sprintf('%02d', $lesson->sequence) }}</td>
+                        <td><a class="" href="{{ $uri }}/overview">{{ $lesson->course->title }}</a></td>
                         <td>
                             @if ($lesson->venue)
                                 <span data-toggle="tooltip" data-placement="top" title="{{ $lesson->venue }}">

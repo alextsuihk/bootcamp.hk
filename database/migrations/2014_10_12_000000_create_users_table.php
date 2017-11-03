@@ -32,6 +32,7 @@ class CreateUsersTable extends Migration
             $table->boolean('whatapps_verify')->default(false);
             $table->boolean('instructor')->default(false);
             $table->boolean('admin')->default(false);
+            $table->boolean('anonymous')->default(true);
             $table->integer('language_id')->unsigned()->nullable();
             $table->foreign('language_id')->references('id')->on('languages');
             $table->string('special_needs')->nullable()->comment('e.g. Disability, Dietary');

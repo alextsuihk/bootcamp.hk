@@ -9,7 +9,6 @@
     <div class="row">
         <span class="mr-auto ml-3">
             <form method="GET" action={{ route('courses.index') }} class="form-inline">
-                {{ csrf_field() }}
                 <input class="form-control " type="search" id="keywords" name="keywords" placeholder="{{ $keywords }}" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
@@ -17,7 +16,7 @@
 
         @if (Helper::admin())
             <span class="ml-auto mr-3">
-                <a class="btn btn-primary" href="{{ route('courses.create') }}">Add Course</a>
+                <a class="btn btn-primary" href="{{ url()->current()."?sortBy=course.title" }}">Add Course</a>
             </span>
         @endif
     </div>
@@ -64,7 +63,7 @@
                                 </td>
                                 <td>
                                     <a class="" data-toggle="tooltip" data-placement="top" title="View detail" 
-                                    href="{{ route('courses.show', $course->number) }}">
+                                    href="{{ route('courses.show', [$course->number, str_slug($course->title)]) }}">
                                     <img src="/img/info.png" alt="Info"></a> 
                                     @if (Helper::admin())
                                         <a class="" data-toggle="tooltip" data-placement="top" title="Edit" 

@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
+use App\Helpers\Helper;
 use App\Question;
-
-
-use Auth; 
 use App\Comment;
 
 class QuestionController extends Controller
@@ -15,8 +14,8 @@ class QuestionController extends Controller
 
     public function __construct()
     {
-        $this->middleware('admin')->only(['blacklist']);
-        $this->middleware('auth')->only(['store', 'votecorrect', 'votewrong']);
+        $this->middleware('admin')->only(['voteadmin']);
+        $this->middleware('auth')->only(['store', 'vote']);
         $this->prefix = config('cache.prefix');
     }
 
@@ -25,52 +24,75 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $type=null)
+    public function index(Request $request, $nav='allQuestions')
     {
-
-        
-        if ($request->has('keywords')           // query-string has "keywords"
-            && !is_null($keywords = $request->input('keywords'))) { // get query string
-            $questions = Question::with(['user','course', 'comments'])->QuestionSearchByKeywords($keywords)->get();
-            $title = 'Top Questions with search';
-        } else {
-                                     // only caching for read-only (index & show)
-            $key = $this->prefix.'AllQuestions';
-            $questions = Cache::remember($key, 5, function() {
-                return Question::with(['user','course', 'comments'])->get();
-            });                     // turn on eager loading
-            $keywords = 'Search... ';                  // index & search use the same view
-            $title = 'Top Questions';
-        }
-
+        $questions = Question::getEverything();
 
         $title = 'Top Questions';
 
-        if ($type =='myNewComments')
-        {
+        if ($nav == 'myQuestions') {
+            $questions = $questions->where('user_id', Auth::id());
+            $title = 'My Questions'; 
+
+        } elseif ($nav =='myNewComments') {
             $questions = $questions->where('user_id', Auth::id())->filter(function ($value, $key) {
                 if (($value->comments->where('viewed', false))->isNotEmpty())
                     { return $value; }
             });
-            $title = 'New comments to my questions';
+            $title = 'New Comments for My Questions';
+
+        } elseif ($nav == 'unanswered') {
+            $questions = $questions->filter(function ($value, $key) {
+                if ($value->comments->isEmpty())
+                    { return $value; }
+            });
+            $title = 'Unanswered Questions';
+
+        } elseif ($nav == 'openQuestions' && Helper::admin()) {
+            $questions = $questions->where('closed', false);
+            $title = 'Opened Questions';
+        }
+
+        if ( !is_null($request->keywords)) {
+            $keywords = preg_split( '/[,\s]+/', $request->keywords);        //convert string to array
+
+            // AT-Pend: the following block looks stupid, let re-factor and make it pretty
+            $questions = $questions->filter(function ($value, $key) use ($keywords) {
+                $contains = false;
+                foreach ($keywords as $keyword) {
+                    if (strpos($value->title, $keyword) !==false || strpos($value->body, $keyword) !==false)
+                    {
+                        $contains = true;
+                        break;
+                    } else {
+                        // if quetions->title & question->body NOT contain keyword, look into each comments
+                        foreach ($value->comments as $comment) {
+                            if (strpos($comment->body, $keyword) !==false && $contains == false)
+                            {
+                                $contains = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if ($contains == true) {
+                    return $value;
+                }
+            });
+            $title = $title.' (with search)';
         }
 
 
-        $questions = $questions->sortByDesc('created_at');
-        //dd($questions);
+        // pick the latest date among question->updated_at & associated comment(s)->updated_at
+        $questions = Question::getLastModifiedAt($questions);
 
-        return view('questions.index', compact(['title', 'questions', 'keywords']));
+        $questions = $questions->sortByDesc('last_modified_at');
+
+        $keywords = $request->keywords;         // workaround: to restore $keyword in case there is a search
+
+        return view('questions.index', compact(['title','nav', 'questions', 'keywords']));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        die('Hello Alex');
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -80,7 +102,36 @@ class QuestionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $detailedMsg = '';
+        if ($request->title == null) {
+            $detailedMsg = '<BR> &#42; Title is required';
+        } elseif (str_word_count($request->title) < 3) {
+            $detailedMsg = '<BR> &#42; Title should have at least 4 words';
+        }
+
+        if ($request->body == null) {
+            $detailedMsg = $detailedMsg. '<BR> &#42; Body is required';
+        }
+
+        if ($detailedMsg != '') {
+            session()->flash('messageAlertType','alert-danger');
+            session()->flash('message','Questions is NOT posted successfully'.$detailedMsg.'<BR>Please retry.');
+            return redirect()->back()->withInput();
+        }
+
+        $question = Question::create([ 
+            'user_id' => Auth::id(),
+            'course_id' => $request->course_id,
+            'title' => $request->title,
+            'body' => $request->body,
+        ]);
+
+        $key = $this->prefix.'AllQuestions';
+        Cache::forget($key);
+
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message','Questions is posted successfully.');
+        return redirect()->back();
     }
 
     /**
@@ -89,42 +140,97 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, $slug = null)
     {
-        die('questionController @ show');
+        $questions = Question::getEverything();
+
+        if (Helper::admin()) {
+            $question = $questions->where('id', $id)->first();
+        } else {
+            $question = $questions->where('id', $id)->where('blacklisted', false)->first(); 
+        }
+
+        if (empty($question))
+        {
+            session()->flash('messageAlertType','alert-warning');
+            session()->flash('message','The question is not found');
+            return redirect()->route('questions.index');
+
+        }
+
+        if (!($slug))
+        {
+            $slug = str_slug($question->title);
+            $url = route('questions.show', [$id, $slug]);
+            request()->session()->reflash();         // flush again before redirect, otherwise message is lost
+            return redirect($url); 
+        }
+
+
+        // clear comments.viewed flag
+        Comment::clearViewedFlag($id);
+
+        return view('questions.show', compact(['question']));
     }
 
+
     /**
-     * Show the form for editing the specified resource.
-     *
+     * Admin vote: 
+     *  update table questsions directly
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function voteadmin($id, $action = null)
     {
-        //
+        if ( $action == 'close' || $action == 'blacklist')
+        {
+            $question = Question::find($id);
+            if ($action == "close") {
+                $question->closed = true;
+                session()->flash('messageAlertType','alert-warning');
+                session()->flash('message','The question is now closed');
+            } else {
+                $question->blacklisted = true;
+                session()->flash('messageAlertType','alert-warning');
+                session()->flash('message','The question is now blacklisted');
+            }
+            $question->save();
+
+            $key = $this->prefix.'AllQuestions';
+            Cache::forget($key);
+        }
+
+        return redirect()->back();
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
+     * General User vote: 
+     *  use Pivot
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function vote($id, $action = null)
     {
-        //
+        if ( $action == 'agree' || $action == 'disagree')               // AT-Pending: WIP, will update later
+        {
+            $question = Question::find($id);
+            if ($action == "close") {
+                $question->closed = true;
+                session()->flash('messageAlertType','alert-warning');
+                session()->flash('message','The question is now closed');
+            } else {
+                $question->blacklisted = true;
+                session()->flash('messageAlertType','alert-warning');
+                session()->flash('message','The question is now blacklisted');
+            }
+            $question->save();
+
+            $key = $this->prefix.'AllQuestions';
+            Cache::forget($key);
+        }
+
+        return redirect()->back();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
 }
