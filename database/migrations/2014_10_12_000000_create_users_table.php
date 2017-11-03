@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->boolean('disabled')->default(false);
             $table->rememberToken();
             $table->string('facebook_id')->index()->nullable();
+            $table->string('linkedin_id')->index()->nullable();
             $table->string('google_id')->index()->nullable();
             $table->string('gitlab_id')->index()->nullable();
             $table->string('avatar')->nullable();

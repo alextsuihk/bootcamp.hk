@@ -38,8 +38,13 @@ return [
     'facebook' => [
         'client_id' => env('FACEBOOK_APP_ID'),
         'client_secret' => env('FACEBOOK_APP_SECRET'),
-        'redirect' => env('OAUTH2_REDIRECT'),
+        'redirect' => env('FACEBOOK_REDIRECT'),
     ],
 
+    'linkedin' => [
+        'client_id' => env('LINKEDIN_APP_ID'),
+        'client_secret' => env('LINKEDIN_APP_SECRET'),
+        'redirect' => env('LINKEDIN_REDIRECT'),
+    ],
 
 ];

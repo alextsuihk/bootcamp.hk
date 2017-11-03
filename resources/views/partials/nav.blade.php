@@ -69,8 +69,11 @@
                         @endif
                         <span class="caret"></span></a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown_login">
-                        <a class="dropdown-item disabled" href="#">My Class</a>
-                        <div class="dropdown-divider"></div>
+                        @if (Auth::user()->avatar)
+                            <a class="dropdown-item disabled" href=""><img src="{!! Auth::user()->avatar !!}" 
+                                width="50" /></a>
+                            <div class="dropdown-divider"></div>
+                        @endif
                         <a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a>
                         <a class="dropdown-item" href="{{ route('password.edit') }}">Change Password</a>
                         <div class="dropdown-divider"></div>  

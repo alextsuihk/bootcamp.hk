@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'nickname', 'email', 'password', 'avatar', 'facebook_id', 'email_token', 'email_token_created_at', 'email_verified'
+        'name', 'nickname', 'email', 'password', 'avatar', 'facebook_id', 'linkedin_id', 'email_token', 'email_token_created_at', 'email_verified'
     ];
 
     /**
@@ -36,6 +36,38 @@ class User extends Authenticatable
         return $this->belongsToMany(Lesson::class);
     }
 
+    /**
+     * User belongs to a language
+     *
+     * @return mixed
+     */
+    public function language()
+    {
+        return $this->belongsTo(Language::class);
+    }
+
+    /**
+     * query scope for searching multiple keyword(s)
+     *
+     * @return mixed
+     */
+    public function scopeUserSearchByKeywords($query, $keywords)
+    {
+        if ($keywords != '') 
+        {
+            // convert keywords from string to array. delimiter either " " or ","
+            $keywords = preg_split( '/[,\s]+/', $keywords);
+
+            $query->where(function ($query) use ($keywords) {
+                foreach ($keywords as $keyword) 
+                {
+                    $query->orwhere("name", "LIKE","%$keyword%")
+                        ->orWhere("nickname", "LIKE", "%$keyword%");
+                }
+            });
+        }
+        return $query;
+    }
 
     public static function getNewUsers()
     {

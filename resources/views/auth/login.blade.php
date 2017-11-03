@@ -9,7 +9,12 @@
     <form class="form-horizontal" method="POST" action="{{ route('login') }}">
         {{ csrf_field() }}
 
-        <a href="{!! url('auth/facebook') !!}"><img src="/img/facebook-sign-in-button.png" width="250"></a>
+        <div class="form-group">
+            <a href="{!! url('auth/facebook') !!}"><img src="/img/facebook-sign-in-button.png" width="250"></a>
+        </div>
+        <div class="form-group">
+            <a href="{!! url('auth/linkedin') !!}"><img src="/img/linkedin-sign-in-button.png" width="250"></a>
+        </div>
 
         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
             <label for="email" class="col-md-4 control-label">E-Mail Address</label>

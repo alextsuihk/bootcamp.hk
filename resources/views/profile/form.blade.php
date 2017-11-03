@@ -48,6 +48,13 @@
         <span class="form-help">(optional field) format: 91234567</span>
     </div>
 
+    <div class="form-group">
+        <a href="{!! url('auth/facebook') !!}"><img src="/img/facebook-sign-in-button.png" width="250"></a>
+    </div>
+    <div class="form-group">
+        <a href="{!! url('auth/linkedin') !!}"><img src="/img/linkedin-sign-in-button.png" width="250"></a>
+    </div>
+
     @if (Helper::admin())
         <div class="form-group">
             <div class="checkbox-inline">

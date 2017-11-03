@@ -72,8 +72,10 @@ Route::post('profile/{id?}', 'ProfileController@update')->name('profile.update')
 Route::get('email/verify/{token}', 'ProfileController@emailverify')->name('email.verify');
 Route::get('password/change', 'Auth\ChangePasswordController@edit')->name('password.edit');
 Route::post('password/change', 'Auth\ChangePasswordController@update')->name('password.update');
-Route::get('auth/facebook', 'Auth\LoginController@redirectToProvider');
-Route::get('auth/facebook/callback', 'Auth\LoginController@handleProviderCallback');
+Route::get('auth/facebook', 'Auth\LoginController@redirectToProviderFacebook');
+Route::get('auth/facebook/callback', 'Auth\LoginController@handleProviderCallbackFacebook');
+Route::get('auth/linkedin', 'Auth\LoginController@redirectToProviderLinkedin');
+Route::get('auth/linkedin/callback', 'Auth\LoginController@handleProviderCallbackLinkedin');
 Route::redirect('logout', '/');
 Auth::routes();
 
@@ -83,6 +85,7 @@ Auth::routes();
  * Admin Controller
  */
 Route::get('admin/users/', 'Admin\UserController@index')->name('admin.users.index'); 
+Route::get('admin/users/{id}', 'Admin\UserController@show')->name('admin.users.show'); 
 /*Route::get('admin/users', 'Admin\PageController@getContactUs');
 */
 
