@@ -1,3 +1,5 @@
+@include ('partials.oauth2', ['title' => 'Link to OAuth2'])
+
 <form method="POST" action="{{ $action }}" >
     {{ csrf_field() }}
 
@@ -49,10 +51,9 @@
     </div>
 
     <div class="form-group">
-        <a href="{!! url('auth/facebook') !!}"><img src="/img/facebook-sign-in-button.png" width="250"></a>
-    </div>
-    <div class="form-group">
-        <a href="{!! url('auth/linkedin') !!}"><img src="/img/linkedin-sign-in-button.png" width="250"></a>
+        <label class="col-md-4 control-label form-label" for="mobile">Your account is linked with:</label>
+            <?php echo ($user->facebook_id)?'<img src="/img/facebook.png">':'' ;?>
+            <?php echo ($user->linkedin_id)?'<img src="/img/linkedin.png">':'' ;?>
     </div>
 
     @if (Helper::admin())
@@ -61,7 +62,7 @@
                 <label>
                     <input type="checkbox" name="active" {{ Helper::old('active', $user) ? 'checked' : '' }} 
                     {{ $disabled }}>Active</label>
-                    <span class="form-help">User is active &amp; allow to login</span>
+                    <span class="form-help">&amp; User is active &amp; allow to login</span>
             </div>
         </div>
     @endif

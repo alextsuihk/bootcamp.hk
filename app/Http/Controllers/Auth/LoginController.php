@@ -37,9 +37,12 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        // AT-Pending: potential issue: "enroll" is a post request, without login, "redirect previous" will
-        $this->redirectTo = url()->previous();
-        $this->middleware('guest')->except('logout');
+        // AT-Pending: it seems, system runs this twice during login !!!
+        // url()->previous()  has conflict with OAuth2 (linking)
+
+        $this->redirectTo = '/';
+        //$this->redirectTo = url()->previous();
+        //$this->middleware('guest')->except('logout');
     }
 
     /**
@@ -68,42 +71,48 @@ class LoginController extends Controller
 
         Auth::login($authUser, true);
 
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message','You have login successfully with Facebook');
         return redirect()->route('home');
     }
 
     private function findOrCreateUserFacebook($facebookUser)
     {
-        $authUser = User::where('email', $facebookUser->email)->first();
+        $authUser = User::where('facebook_id', $facebookUser->id)->first();
 
-        if ($authUser && ($authUser->facebook_id == $facebookUser->id))
-        {                                   // if both email & facebook_id matched, just login
+        if ($authUser && !Auth::check())    // if facebook record is find & not login, just login
+        {                                   
             return $authUser;
         }                                   // otherwise save the user info
 
-        if ($authUser)                      // if only email exist, update database with facebook_id
+        if (Auth::check())                  // if already login, update database with facebook_id
         {
+            $authUser = User::find(Auth::id());     //login logged-in user info
             $authUser->facebook_id = $facebookUser->id;
-            if ($authUser->avatar == null) {
+            if ($authUser->avatar == null) {        // don't over-write original avatar
                 $authUser->avatar = $facebookUser->avatar;
             }
+            if ($authUser->email == null) {         // don't over-write original email
+                $authUser->email = $facebookUser->email;
+            }
             $authUser->save();
-            
+        
         } else {
             $authUser = User::create([
-                'name' => str_random(10),       // need to create an unique temp name
+                'name' => str_random(10),       // need to create an UNIQUE temp name
                 'nickname' => $facebookUser->name,
-                'password' => str_random(50),   // creating a fake password
+                'password' => '',               // null password
                 'email' => $facebookUser->email,
                 'facebook_id' => $facebookUser->id,
                 'avatar' => $facebookUser->avatar,
             ]);
 
             $authUser->name = substr(strtolower(explode(' ',trim($facebookUser->name))[0]).$authUser->id, -20); 
-            $authUser->save();          // contcat first_name & id, then update database, (only take last 20 characters)
+            $authUser->save();          
+                        // contcat first_name & id, then update database, (only take last 20 characters)
         }
 
         return $authUser;
-
     }
 
 
@@ -133,39 +142,45 @@ class LoginController extends Controller
 
         Auth::login($authUser, true);
 
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message','You have login successfully with LinkedIn');
         return redirect()->route('home');
     }
 
     private function findOrCreateUserLinkedin($linkedinUser)
     {
-        $authUser = User::where('email', $linkedinUser->email)->first();
+        $authUser = User::where('linkedin_id', $linkedinUser->id)->first();
 
-
-        if ($authUser && ($authUser->linkedin_id == $linkedinUser->id))
-        {                                   // if both email & linkedid_id matched, just login
+        if ($authUser && !Auth::check())    // if linkedin record is find & not login, just login
+        {                                   
             return $authUser;
         }                                   // otherwise save the user info
 
-        if ($authUser)                      // if only email exist, update database with linkedin_id
+        if (Auth::check())                  // if already login, update database with linkedin_id
         {
+            $authUser = User::find(Auth::id());     //login logged-in user info
             $authUser->linkedin_id = $linkedinUser->id;
-            if ($authUser->avatar == null) {
+            if ($authUser->avatar == null) {        // don't over-write original avatar
                 $authUser->avatar = $linkedinUser->avatar;
             }
+            if ($authUser->email == null) {         // don't over-write original email
+                $authUser->email = $linkedinUser->email;
+            }
             $authUser->save();
-            
+        
         } else {
             $authUser = User::create([
-                'name' => str_random(10),       // need to create an unique temp name
+                'name' => str_random(10),       // need to create an UNIQUE temp name
                 'nickname' => $linkedinUser->name,
-                'password' => str_random(50),   // creating a fake password
+                'password' => '',               // null password
                 'email' => $linkedinUser->email,
                 'linkedin_id' => $linkedinUser->id,
                 'avatar' => $linkedinUser->avatar,
             ]);
 
             $authUser->name = substr(strtolower(explode(' ',trim($linkedinUser->name))[0]).$authUser->id, -20); 
-            $authUser->save();          // contcat first_name & id, then update database, (only take last 20 characters)
+            $authUser->save();          
+                        // contcat first_name & id, then update database, (only take last 20 characters)
         }
 
         return $authUser;

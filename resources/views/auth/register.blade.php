@@ -1,21 +1,15 @@
 @extends ('layouts.master')
 
-@section ('title', 'Login')
+@section ('title', 'Registration')
 
 @section('content')
     <h2>Registration Page</h2>
     <hr>
+    @include ('partials.oauth2', ['title' => 'OAuth2 Login'])
 
     <form class="form-horizontal" method="POST" action="{{ route('register') }}">
         {{ csrf_field() }}
-
-        <div class="form-group">
-            <a href="{!! url('auth/facebook') !!}"><img src="/img/facebook-sign-in-button.png" width="250"></a>
-        </div>
-        <div class="form-group">
-            <a href="{!! url('auth/linkedin') !!}"><img src="/img/linkedin-sign-in-button.png" width="250"></a>
-        </div>
-        
+      
         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
             <label for="name" class="col-md-4 control-label">Username</label>
             <div class="col-md-6">
