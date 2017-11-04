@@ -27,12 +27,7 @@ class ProfileController extends Controller
      */
     public function sendemailverify($id = 0)
     {
-        if (!(Helper::admin()) || !(request()->session()->has('impersonate')))
-        {                           // if not admin, fallback to login user id
-            $id = Auth::id();
-        } 
-
-        $user = User::find($id);
+        $user = Auth::user();
         $deltaMinutes = $user->email_token_created_at->diffInMinutes(now());
         if ($user->email_verified)
         {
@@ -106,12 +101,8 @@ class ProfileController extends Controller
      */
     public function edit($id = 0)
     {
-        if (!(Helper::admin()) || !(request()->session()->has('impersonate')))
-        {                           // if not admin, fallback to login user id
-            $id = Auth::id();
-        } 
+        $user = Auth::user();
 
-        $user = User::find($id);
         return view('profile.edit', compact('user'));
     }
 
@@ -126,15 +117,19 @@ class ProfileController extends Controller
     {
         $validatedData = $request->validate([
             'nickname' => 'required|max:20',
-            'mobile'   => 'nullable|digits:8|unique:users',
+            'mobile'   => 'nullable|digits:8',
         ]);
 
-        if (!(Helper::admin()) || !(request()->session()->has('impersonate')))
-        {                           // if not admin, fallback to login user id
-            $id = Auth::id();
-        } 
+        $count = User::where('mobile', $validatedData['mobile'])->where('id', '!=', $id)->count();
+        if ($count > 0)
+        {
+            return redirect()->back()
+                        ->withErrors(['mobile' => 'The mobile phone is using used by another person'])
+                        ->withInput();
+        }
 
-        $user = User::find($id);
+        $user = Auth::user();
+
         $user->nickname = $validatedData['nickname'];
         $user->mobile = $validatedData['mobile'];
         $user->save();
@@ -143,6 +138,37 @@ class ProfileController extends Controller
         session()->flash('message','User profile is updated');
         return redirect()->route('profile.edit');
 
+    }
+
+    /**
+     * Detach Facebook/Linkedin login
+     *
+     * @param  string
+     * @return \
+     */
+    public function detach($type=null)
+    {
+        $user = Auth::user();
+        if ($user->password == null) {
+            session()->flash('messageAlertType','alert-warning');
+            session()->flash('message','You MUST create a password before unlink '.$type);
+            return redirect()->route('password.edit');
+        }
+
+        switch ($type)
+        {
+            case 'Facebook':
+                $user->facebook_id = null;
+                $user->save();
+                break;
+            case 'LinkedIn':
+                $user->linkedin_id = null;
+                $user->save();
+                break;
+        }
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message', $type.' is disassociated with your account');
+        return redirect()->route('profile.edit');
     }
 
 };

@@ -75,7 +75,7 @@ class User extends Authenticatable
         $myQuestions = Cache::remember($key, 60, function() {
             return static::where('created_at', '>', Carbon::now()->subDays(14) )->count();
         });
-
         return $myQuestions;
     }
+
 }

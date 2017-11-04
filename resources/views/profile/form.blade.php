@@ -4,14 +4,14 @@
     {{ csrf_field() }}
 
     <div class="form-group">
-        <label class="col-md-4 control-label form-label" for="name">Username:</label>
+        <label class="col-md-5 control-label form-label" for="name">Username:</label>
         <input type="text" class="form-control col-md-6" id="name" name="name" 
         value="{{ $user->name }}" disabled>
         <span class="form-help">cannot change username, it is also used in gitlab</span>
     </div>
 
     <div class="form-group">
-        <label class="col-md-4 control-label form-label" for="nickname">Nickame:</label>
+        <label class="col-md-5 control-label form-label" for="nickname">Nickame:</label>
         <input type="text" class="form-control col-md-6" id="nickname" name="nickname" 
         value="{{ Helper::old('nickname', $user) }}" required>
         @if ($errors->has('nickname'))
@@ -23,7 +23,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-4 control-label form-label" for="email">Email:
+        <label class="col-md-5 control-label form-label" for="email">Email:
         @if (Auth::user()->email_verified)
             <span class="badge badge-success">verified</span>
         @else
@@ -39,7 +39,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-4 control-label form-label" for="mobile">Mobile:</label>
+        <label class="col-md-5 control-label form-label" for="mobile">Mobile:</label>
         <input type="number" class="form-control col-md-6" id="mobile" name="mobile" 
         value="{{ Helper::old('mobile', $user) }}"  {{ $disabled }}>
         @if ($errors->has('mobile'))
@@ -51,11 +51,20 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-4 control-label form-label" for="mobile">Your account is linked with:</label>
-            <?php echo ($user->facebook_id)?'<img src="/img/facebook.png">':'' ;?>
-            <?php echo ($user->linkedin_id)?'<img src="/img/linkedin.png">':'' ;?>
+        <p class="col-md-5 control-label form-label">Your account is linked with:
+            @if ($user->facebook_id)
+                <a href="{{ route('profile.detach', 'Facebook') }}" title="unlink Facebook login">
+                    <img src="/img/facebook.png"></a>
+            @endif
+
+            @if ($user->linkedin_id)
+                <a href="{{ route('profile.detach', 'LinkedIn') }}" title="unlink LinkedIn login">
+                    <img src="/img/linkedin.png"></a>
+            @endif
+        </p>
     </div>
 
+{{-- AT-Pending: move user activate/deactivate to admin/usercontroller --}}
     @if (Helper::admin())
         <div class="form-group">
             <div class="checkbox-inline">

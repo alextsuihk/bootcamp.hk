@@ -72,10 +72,11 @@ Route::post('profile/{id?}', 'ProfileController@update')->name('profile.update')
 Route::get('email/verify/{token}', 'ProfileController@emailverify')->name('email.verify');
 Route::get('password/change', 'Auth\ChangePasswordController@edit')->name('password.edit');
 Route::post('password/change', 'Auth\ChangePasswordController@update')->name('password.update');
-Route::get('auth/facebook', 'Auth\LoginController@redirectToProviderFacebook');
-Route::get('auth/facebook/callback', 'Auth\LoginController@handleProviderCallbackFacebook');
-Route::get('auth/linkedin', 'Auth\LoginController@redirectToProviderLinkedin');
-Route::get('auth/linkedin/callback', 'Auth\LoginController@handleProviderCallbackLinkedin');
+Route::get('auth/facebook', 'Auth\Oauth2Controller@redirectToProviderFacebook');
+Route::get('auth/facebook/callback', 'Auth\Oauth2Controller@handleProviderCallbackFacebook');
+Route::get('auth/linkedin', 'Auth\Oauth2Controller@redirectToProviderLinkedin');
+Route::get('auth/linkedin/callback', 'Auth\Oauth2Controller@handleProviderCallbackLinkedin');
+Route::get('auth/detach/{type}', 'ProfileController@detach')->name('profile.detach');
 Route::redirect('logout', '/');
 Auth::routes();
 

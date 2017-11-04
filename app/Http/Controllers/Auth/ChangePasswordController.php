@@ -18,8 +18,7 @@ class ChangePasswordController extends Controller
 
     public function edit()
     {
-        $id = Auth::id();
-        $user = User::find($id);
+        $user = Auth::user();
         return view('auth.passwords.edit', compact('user'));
     }
 
@@ -32,9 +31,6 @@ class ChangePasswordController extends Controller
      */
     public function update(Request $request)
     {
-        $id = Auth::id();
-        $user = User::find($id);
-
         $rules = [
             'password' => 'required|string|min:6|confirmed',
         ];
@@ -46,22 +42,14 @@ class ChangePasswordController extends Controller
 
         $validator = Validator::make($request->all(), $rules, $messages);
 
-        // checking old password
-        if (!($wrongPassword = Hash::check($request->old_passowrd, $user->password)))
-        {
-            $originalMsgBag = ($validator->messages()->toArray());
-            $newMsgBag      = array_add($originalMsgBag, 'old_password', ['Passowrd is incorrect']);
-        }
-
-        // return either validtion fail or original password is wrong
-        if ($validator->fails() || $wrongPassword) 
+        if ($validator->fails() ) 
         {
             return redirect()->back()
-                        /*->withErrors($validator)*/
-                        ->withErrors($newMsgBag)
+                        ->withErrors($validator)
                         ->withInput();
         }
 
+        $user = Auth::user();
         $user->password = bcrypt($request->password);
         $user->save();
 
