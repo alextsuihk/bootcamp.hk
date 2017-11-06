@@ -64,27 +64,9 @@
         </p>
     </div>
 
-{{-- AT-Pending: move user activate/deactivate to admin/usercontroller --}}
-    @if (Helper::admin())
-        <div class="form-group">
-            <div class="checkbox-inline">
-                <label>
-                    <input type="checkbox" name="active" {{ Helper::old('active', $user) ? 'checked' : '' }} 
-                    {{ $disabled }}>Active</label>
-                    <span class="form-help">&amp; User is active &amp; allow to login</span>
-            </div>
-        </div>
-    @endif
-
-    @if ($type == 'show')
-        <div class="form-group">
-            <a class="btn btn-primary" href="{{ route('profile.edit') }}">Return</a>
-        </div>
-    @else
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">{{ $button }}</button>
-            <a class="btn btn-secondary" href="{{ route('home') }}">Cancel</a>
-        </div>
-    @endif
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">{{ $button }}</button>
+        <a class="btn btn-secondary" href="{{ route('home') }}">Cancel</a>
+    </div>
 
 </form>

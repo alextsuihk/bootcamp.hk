@@ -35,6 +35,7 @@
                     <a class="dropdown-item" href="/contactus">Contact Us</a>
 {{--                     <a class="dropdown-item" href="/aboutus#SponsorVenue">Venue Support</a>
                     <a class="dropdown-item" href="#">Consultant Services</a> --}}
+                    <a class="dropdown-item" href="/support">Support</a>
                 </div>
             </li>
         </ul>

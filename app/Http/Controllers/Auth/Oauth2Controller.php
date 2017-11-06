@@ -32,17 +32,22 @@ class Oauth2Controller extends Controller
         } catch (Exception $e) {
             return redirect('auth/facebook');
         }
+
         $authUser = $this->findOrCreateUserFacebook($user);
 
         if ($authUser == null) {
             session()->flash('messageAlertType','alert-danger');
             session()->flash('message','There is another user with the same email, please login first before assoicating with Facebook');
             return redirect()->route('register');
+        } elseif ($authUser == 'accountTaken') {
+            session()->flash('messageAlertType','alert-danger');
+            session()->flash('message','This Facebook Account is associated with another account ! <br>You should logout this session, and login using Facebook, <br>and then disassociate Facebook account');
+            return redirect()->route('profile.edit');
         } else {
             Auth::login($authUser, true);
             session()->flash('messageAlertType','alert-success');
             session()->flash('message','You have login successfully with Facebook');
-            return redirect()->route('home');
+            return redirect()->back();
         }
     }
 
@@ -54,6 +59,11 @@ class Oauth2Controller extends Controller
         {                                   
             return $authUser;
         }                                   // otherwise save the user info
+
+        if ($authUser && Auth::check() && Auth::id() != $authUser->id) 
+        {
+            return 'accountTaken'; 
+        }
 
         if (Auth::check())                  // if already login, update database with facebook_id
         {
@@ -113,17 +123,22 @@ class Oauth2Controller extends Controller
         } catch (Exception $e) {
             return redirect('auth/linkedin');
         }
+
         $authUser = $this->findOrCreateUserLinkedin($user);
 
-        if ($authUser == null) {
+        if ($authUser == 'emailTaken') {
             session()->flash('messageAlertType','alert-danger');
             session()->flash('message','There is another user with the same email, please login first before assoicating with LinkedIn');
             return redirect()->route('login');
+        } elseif ($authUser == 'accountTaken') {
+            session()->flash('messageAlertType','alert-danger');
+            session()->flash('message','This LinkedIn Account is associated with another account ! <br>You should logout this session, and login using LinkedIn, <br>and then disassociate LinkedIn account');
+            return redirect()->route('profile.edit');
         } else {
             Auth::login($authUser, true);
             session()->flash('messageAlertType','alert-success');
             session()->flash('message','You have login successfully with LinkedIn');
-            return redirect()->route('home');
+            return redirect()->back();
         }
     }
 
@@ -135,6 +150,11 @@ class Oauth2Controller extends Controller
         {                                   
             return $authUser;
         }                                   // otherwise save the user info
+
+        if ($authUser && Auth::check() && Auth::id() != $authUser->id) 
+        {
+            return 'accountTaken'; 
+        }
 
         if (Auth::check())                  // if already login, update database with linkedin_id
         {
@@ -151,7 +171,7 @@ class Oauth2Controller extends Controller
         } else {
             $emailTaken = User::where('email', $linkedinUser->email)->count();
             if ($emailTaken > 0) {
-                return null; 
+                return 'emailTaken'; 
             }
 
             $authUser = User::create([

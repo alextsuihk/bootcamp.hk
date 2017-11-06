@@ -5,6 +5,18 @@ use Illuminate\Support\Facades\Auth;
 
 class Helper
 {
+
+    public static function userDisabled()
+    {
+        if (Auth::check() && Auth::user()->disabled) {
+            session()->flash('messageAlertType','alert-danger');
+            session()->flash('message','Your account has been disabled. <br>Please contact system administrator 
+                <a href="mailto:admin@bootcamp.hk?Subject=Account Disabled ('.Auth::id().')" target="_top">(admin@bootcamp.hk)</a>');
+            Auth::logout();
+            return redirect('/');
+        }
+    }
+
     /**
      * Retrieve an old input item, if null, then retrieve Edit Form item
      *

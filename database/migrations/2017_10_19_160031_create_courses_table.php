@@ -17,7 +17,7 @@ class CreateCoursesTable extends Migration
             $table->increments('id');
             $table->string('number', 3)->unique();         // e.g. 101, 201
             $table->string('title',50);
-            $table->text('abstract');
+            $table->mediumText('abstract');
             $table->integer('level_id')->unsigned()->default(21); 
             $table->foreign('level_id')->references('id')->on('levels');
             //$table->string('gitlab_uri')->nullable();   // e.g. courses/201

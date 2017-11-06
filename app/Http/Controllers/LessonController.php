@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\LessonStoreUpdate;
 use Carbon\Carbon;
 use App\Lesson;
 use App\Course;
 use App\Level;
 use App\TeachingLanguage;
+use App\Mail\EnrollLesson;
 
+use App\Mail\VerifyEmail;
 
 class LessonController extends Controller
 {
@@ -57,7 +60,7 @@ class LessonController extends Controller
         }
 
 
-        if ($request->has('sortBy'))
+        if ($request->filled('sortBy'))
         {
             if ($request->sortOrder == 'desc')
             {
@@ -93,7 +96,11 @@ class LessonController extends Controller
             // if requesting to enroll & not yet enrolled
         } else {
             $lesson->users()->attach(Auth::id(), ['enrolled_at' => now()]);
-            // AT-Pending: queue email to user, cc enrollment@bootcamp.hk
+            
+            $user = Auth::user();
+            $message = (new EnrollLesson( $user, $lesson));
+            Mail::to($user->email)->queue($message);
+
             session()->flash('messageAlertType','alert-success');
             session()->flash('message','Lesson is enrolled successfully. See you in the class');
         } 

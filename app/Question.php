@@ -89,16 +89,6 @@ class Question extends Model
         return $count;
     }
 
-    public static function getOpenQuestions_old()
-    {
-        $key = 'user_'.Auth::id().'_myQuestions';  
-        $myQuestions = Cache::remember($key, 5, function() {
-            return static::where('user_id', Auth::id())->count();
-        });
-
-        return $myQuestions;
-    }
-
     /**
      * Get # of questions posted within past 14 days
      *

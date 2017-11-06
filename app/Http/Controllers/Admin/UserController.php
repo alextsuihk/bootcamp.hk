@@ -22,7 +22,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->has('keywords')           // query-string has "keywords"
+        if ($request->filled('keywords')           // query-string has "keywords"
             && !is_null($keywords = $request->input('keywords'))) { // get query string
             $courses = User::with('language')->UserSearchByKeywords($keywords)->get();
 

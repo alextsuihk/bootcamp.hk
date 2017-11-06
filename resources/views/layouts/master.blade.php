@@ -1,3 +1,7 @@
+@php
+    Helper::userDisabled();
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
     <head>

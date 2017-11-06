@@ -19,7 +19,7 @@ class CreateCommentsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('question_id')->unsigned()->index();
             $table->foreign('question_id')->references('id')->on('questions');
-            $table->text('body');
+            $table->mediumText('body');
             $table->boolean('viewed')->default(false);
             $table->boolean('blacklisted')->default(false);
             $table->boolean('correct')->nullable();

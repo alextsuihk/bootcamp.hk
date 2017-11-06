@@ -17,14 +17,14 @@ class CreateQuestionsTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('course_id')->unsigned()->nullable()->index();
+            $table->integer('course_id')->unsigned()->default(0)->index();
             $table->string('title');
-            $table->text('body');
+            $table->mediumText('body');
             $table->boolean('blacklisted')->default(false);
             $table->boolean('closed')->default(false);
             $table->timestamps();
         });
-        DB::update("ALTER TABLE users AUTO_INCREMENT = 10000;");
+        DB::update("ALTER TABLE questions AUTO_INCREMENT = 10000;");
     }
 
     /**

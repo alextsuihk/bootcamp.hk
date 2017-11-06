@@ -9,6 +9,22 @@
 <form method="POST" action="/password/change" >
     {{ csrf_field() }}
 
+    @if ($user->password)
+        <div class="form-group{{ $errors->has('old_password') ? ' has-error' : '' }}">
+            <label for="password" class="col-md-4 control-label form-label">Current Password</label>
+
+            <div class="col-md-6">
+                <input id="old_password" type="password" class="form-control" name="old_password" required>
+
+                @if ($errors->has('old_password'))
+                    <span class="form-error">
+                        <strong>{{ $errors->first('old_password') }}</strong>
+                    </span>
+                @endif
+            </div>
+        </div>
+    @endif
+
     <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
         <label for="password" class="col-md-4 control-label form-label">Password</label>
 

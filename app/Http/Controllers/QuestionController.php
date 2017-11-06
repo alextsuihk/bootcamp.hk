@@ -166,7 +166,6 @@ class QuestionController extends Controller
             return redirect($url); 
         }
 
-
         // clear comments.viewed flag
         Comment::clearViewedFlag($id);
 

@@ -29,12 +29,12 @@
     <div class="form-control mceNonEditable" style="background-color: white;">
         {!! $question->body !!}</div>
 
-    @isset ($question->course_id)
+    @if ($question->course_id > 0)
     <p>
         This question is linked to Course# <a href="{{ route('courses.show', $question->course->number) }}">
             {{ $question->course->number }} : {{ $question->course->title }}<a>
     </p>
-    @endisset
+    @endif
 
     @if (Helper::admin())
         <p>

@@ -19,6 +19,7 @@ Route::get('contactus', 'PageController@getContactUs');*/
 //AT-Pending: go ahead & remove PageController
 Route::view('aboutus', 'pages/aboutus');
 Route::view('contactus', 'pages/contactus');
+Route::view('contactus', 'pages/support');
 /**
  * Courses Controller
  */
@@ -87,6 +88,8 @@ Auth::routes();
  */
 Route::get('admin/users/', 'Admin\UserController@index')->name('admin.users.index'); 
 Route::get('admin/users/{id}', 'Admin\UserController@show')->name('admin.users.show'); 
+Route::get('admin/impersonate/{id}', 'Admin\UserController@impersonate')->name('admin.users.impersonate');
+Route::get('admin/umpersonate', 'Admin\UserController@unimpersonate')->name('admin.users.unimpersonate');
 /*Route::get('admin/users', 'Admin\PageController@getContactUs');
 */
 

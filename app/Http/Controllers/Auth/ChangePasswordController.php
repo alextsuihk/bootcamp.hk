@@ -31,6 +31,15 @@ class ChangePasswordController extends Controller
      */
     public function update(Request $request)
     {
+        $user = Auth::user();
+        
+        if (strlen($user->password) != null && !Hash::check($request->old_password, $user->password))
+        {
+            return redirect()->back()
+                        /*->withErrors($validator)*/
+                        ->withErrors(['old_password' => 'Password is incorrect']);
+        } 
+
         $rules = [
             'password' => 'required|string|min:6|confirmed',
         ];
@@ -45,11 +54,9 @@ class ChangePasswordController extends Controller
         if ($validator->fails() ) 
         {
             return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput();
+                        ->withErrors($validator);
         }
 
-        $user = Auth::user();
         $user->password = bcrypt($request->password);
         $user->save();
 

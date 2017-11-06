@@ -25,8 +25,8 @@ class CourseController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->has('keywords')           // query-string has "keywords"
-            && !is_null($keywords = $request->input('keywords'))) { // get query string
+        if ($request->filled('keywords')) {          // query-string has "keywords"
+            $keywords = $request->keywords;
             $courses = Course::with('level')->CourseSearchByKeywords($keywords)->get();
 
         } else {

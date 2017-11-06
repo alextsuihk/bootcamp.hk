@@ -22,9 +22,9 @@
             <thead>
                 <tr>
                     <th>No.</th>
-                    <th>Avatar</th>
-                    <th>Nickname</th>
                     <th></th>
+                    <th>Nickname</th>
+                    <th>Anon</th>
                     <th>Email<br>Mobile</th>
                     <th>FB</th>
                     <th></th>
@@ -35,9 +35,13 @@
             <tbody>
                 @foreach ($users as $user)
                     <tr>
-
-                        <td><a href="{{ route('admin.users.show', $user->id) }}"><strong>
-                            {{ $user->id}}</strong></a></td>
+                        <td>
+                            @if ($user->disabled)
+                                <span style="color:red;"><strong>{{ $user->id}}</strong><br>(disabled)</span>
+                            @else
+                                <strong>{{ $user->id}}</strong>
+                            @endif
+                        </a></td>
                         <td><img src="{{ $user->avatar }}" height="25"></td>
                         <td>{{ $user->name }} <br><small>{{ $user->nickname }}</small></td>
                         <td><?php echo ($user->anonymous)?'<img src="/img/anonymous.png">':'' ;?></td>
@@ -48,11 +52,13 @@
                             <?php echo ($user->linkedin_id)?'<img src="/img/linkedin.png">':'' ;?>
                         </td>
                         <td><?php echo ($user->admin)?'A':'' ;?>
-                            <?php echo ($user->teacher)?'T':'' ;?>
+                            <?php echo ($user->instructor)?'I':'' ;?>
                         </td>
                         <td><small>{{ $user->created_at->diffForHumans() }}
                             <br>{{ $user->updated_at->diffForHumans() }}</small></td>
-                        <td>Impersonate</td>
+                        <td>
+                        <a class="btn btn-primary" href="{{ route('admin.users.show', $user->id) }}">Settings</a>
+                        </td>
                     </tr>
 
                 @endforeach

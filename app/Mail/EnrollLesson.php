@@ -7,23 +7,24 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\User;
+use App\Lesson;
 
-class VerifyEmail extends Mailable
+class EnrollLesson extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     protected $user;
-    protected $expireInMinutes;
+    protected $lesson;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user, $expireInMinutes)
+    public function __construct($user, $lesson)
     {
         $this->user = $user;
-        $this->expireInMinutes =$expireInMinutes;
+        $this->lesson = $lesson;
     }
 
     /**
@@ -33,11 +34,9 @@ class VerifyEmail extends Mailable
      */
     public function build()
     {
-        $url = url('/email/verify/'.$this->user->email_token);
-
-        return $this->subject('Verify Email')
-            ->markdown('emails.verifyemail', 
-            ['user' => $this->user, 'url' => $url, 'expireInMinutes' => $this->expireInMinutes]
+        return $this->subject('Enrollment Confirmation')
+            ->markdown('emails.enroll_lession', 
+            ['user' => $this->user, 'lesson' => $this->lesson]
         );
     }
 }
