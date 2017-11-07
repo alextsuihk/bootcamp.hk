@@ -99,6 +99,7 @@ class LessonController extends Controller
             
             $user = Auth::user();
             $message = (new EnrollLesson( $user, $lesson));
+
             Mail::to($user->email)->queue($message);
 
             session()->flash('messageAlertType','alert-success');

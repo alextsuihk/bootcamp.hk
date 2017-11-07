@@ -7,18 +7,30 @@
 @endisset
 
 You have sucessfully enrolled the following class
-table
 
+Class ID: [**{{ $number }}**]({{ $url }})  
+Course Title: **{{ $lesson->course->title }}**  
+Venue: **{{ $lesson->venue }}**  
+Schedule: **{{ $lesson->first_day }}** ~ **{{ $lesson->last_day }}** ({{ $lesson->schedule }})
+[{{ $url }}]({{ $url }})
+<br>
+<br>
 
-https://www.bootcamp.hk/courses/101/linux-basic/lessons
+@component('mail::panel')
+You coud access your class enrollment detail here: 
 
-https://www.bootcamp.hk/lessons/myFutureLessons
+Future Classes
+[https://www.bootcamp.hk/lessons/myFutureLessons](https://www.bootcamp.hk/lessons/myFutureLessons)  
 
-URL
-
-@component('mail::button', ['url' => ''])
-Button Text
+Current Classes
+[https://www.bootcamp.hk/lessons/myCurrentLessons](https://www.bootcamp.hk/lessons/myCurrentLessons)
 @endcomponent
+
+@component('mail::subcopy')
+Please remember to bring your notebook and pre-install necessary software.  
+@endcomponent
+<br>
+PS. See you in the class  
 
 Thank you
 {{-- Thanks,<br>

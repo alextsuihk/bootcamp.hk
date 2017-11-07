@@ -21,7 +21,7 @@ class EnrollLesson extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($user, $lesson)
+    public function __construct(User $user, Lesson $lesson)
     {
         $this->user = $user;
         $this->lesson = $lesson;
@@ -34,9 +34,14 @@ class EnrollLesson extends Mailable implements ShouldQueue
      */
     public function build()
     {
+        $lesson_number = $this->lesson->course->number.'-'.sprintf('%02d', $this->lesson->sequence);
+        $url = route('courses.show', 
+            [$this->lesson->course->number, str_slug($this->lesson->course->title)]) . '/lessons';
+
         return $this->subject('Enrollment Confirmation')
             ->markdown('emails.enroll_lession', 
-            ['user' => $this->user, 'lesson' => $this->lesson]
+            ['user' => $this->user, 'lesson' => $this->lesson,
+             'number' => $lesson_number, 'url' => $url]
         );
     }
 }

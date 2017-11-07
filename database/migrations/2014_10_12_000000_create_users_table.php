@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('email', 80)->unique();
             $table->string('email_token', 64)->nullable();
             $table->datetime('email_token_created_at')->default('2000-01-01 00:00:00');
-            $table->string('email_verified')->default(false);
+            $table->boolean('email_verified')->default(false);
             $table->string('password')->nullable();                 // in case account is created thru OAuth
             $table->boolean('disabled')->default(false);
             $table->rememberToken();
