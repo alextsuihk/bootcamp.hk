@@ -8,6 +8,7 @@ use App\Lesson;
 use App\Comment;
 use App\Question;
 use App\User; 
+use App\Course;
 
 class ComposerServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,7 @@ class ComposerServiceProvider extends ServiceProvider
             $newLessons = Lesson::getNewLessonCount();
             $allLessons = Lesson::getAllLessonCount();
             $newUsers = User::getNewUserCount();
+            $myFollowedCourses = Course::getMyFollowedCourseCount();
             
 
             $view->with('myQuestions', $myQuestions)
@@ -40,7 +42,8 @@ class ComposerServiceProvider extends ServiceProvider
             ->with('newLessons', $newLessons)
             ->with('allLessons', $allLessons)
             ->with('newUsers', $newUsers)
-            ->with('newQuestions', $newQuestions);
+            ->with('newQuestions', $newQuestions)
+            ->with('myFollowedCourses', $myFollowedCourses);
         });                 
         // whenever viewing partials.sidebar, this callback is executed
         // binding to the view

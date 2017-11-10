@@ -5,7 +5,7 @@
 @else
 
     <div class="table-responsive">
-        <table class="table" sytle="border:none;">
+        <table class="table table-striped">
 {{--                 <thead>
                 <tr>
                     <th>No.</th>
@@ -19,7 +19,7 @@
                 @foreach ($questions as $question)
                     @php
                         if ($question->blacklisted == true) {
-                            $blacklisted = "[Blacklisted]<br>";
+                            $blacklisted = "<span style='color: red;'>[Blacklisted]</span><br>";
                         } else {
                             $blacklisted = '';
                         }
@@ -54,21 +54,21 @@
                     @endphp
 
                     <tr>
-                        <td rowspan="2" colspan="1" style="vertical-align: middle;"><center>
+                        <td style="vertical-align: middle;"><center>
                             {!! $blacklisted !!}
                             {!! $update !!}
                             {{ count($question->comments) }}
                             {{ str_plural('comment', count($question->comments)) }}
                          </center></td>
 
-                        <td rowspan="1" colspan="2">
+                        <td style="vertical-align: middle;">
                             @if ($question->blacklisted == true)
-                                <strong><h4><span style="text-decoration:line-through;">{{ $question->title }}</span></h4></strong></a>
+                                <strong><h5><span style="text-decoration:line-through;">{{ $question->title }}
+                                </span></h5></strong></a>
                             @else
-                                <a href="{{ route('questions.show', [$question->id, str_slug($question->title)]) }}"><strong><h4>{{ $question->title }}</h4></strong></a>
+                                <a href="{{ route('questions.show', [$question->id, str_slug($question->title)]) }}"><strong><h5>{{ $question->title }}</h5></strong></a>
                             @endif
                         </td>
-                        <td></td>
 {{--                         <td rowspan="2" colspan="1" style="vertical-align: middle;">
                             <a class="btn btn-warning" href="{{route('questions.complain', $question->id)}}">
                                     Complain</a>
@@ -77,12 +77,9 @@
                                     Blacklist</a>
                             @endif
                         </td> --}}
-                    </tr>
-                    <tr>
-                            <td class="text-left">
-                                {{-- AT-Pending: future tags go here --}}
-                            </td>
-                            <td class="text-right">modified {{ $last_modified->diffForHumans() }} <br>by {{ $username }}</td>
+                        <td class="text-right"><small>
+                            modified {{ $last_modified->diffForHumans() }} by {{ $username }}
+                        </small></td>
                     </tr>
                 @endforeach
             </tbody>

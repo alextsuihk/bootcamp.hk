@@ -1,10 +1,3 @@
-{{-- 
-AT-Pending: add Auth::check()
-show My_Class
-show My_Question: no of unread answered
-
- --}}
-
 @if (Helper::admin())
     <ul class="nav nav-pills flex-column">
         <li class="nav-item">
@@ -39,20 +32,26 @@ show My_Question: no of unread answered
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ route('lessons.index', ['type'=>'myPastLessons']) }}">
-                Past Classes&nbsp;
+                Past Lessons&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myPastLessons }}</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ route('lessons.index', ['type'=>'myCurrentLessons']) }}">
-                Current Classes&nbsp;
+                Current Lessons&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myCurrentLessons }}</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ route('lessons.index', ['type'=>'myFutureLessons']) }}">
-                Future Classes&nbsp;
+                Future Lessons&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myFutureLessons }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('courses.index', ['type'=>'myFollowedCourses']) }}">
+                Courses Followed&nbsp;
+                <span class="badge badge-pill badge-info">{{ $myFollowedCourses }}</span>
             </a>
         </li>
         <li class="nav-item">
@@ -67,12 +66,12 @@ show My_Question: no of unread answered
         <span class="nav-link"><strong>Recommendations</strong></span>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{{ route('lessons.index', ['type'=>'new']) }}">New Classes&nbsp;
+        <a class="nav-link" href="{{ route('lessons.index', ['type'=>'new']) }}">New Lessons&nbsp;
             <span class="badge badge-pill badge-info">{{ $newLessons }}</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{{ route('lessons.index') }}">All Classes&nbsp;
+        <a class="nav-link" href="{{ route('lessons.index') }}">All Lessons&nbsp;
             <span class="badge badge-pill badge-info">{{ $allLessons }}</span>
         </a>
     </li>

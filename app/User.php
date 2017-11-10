@@ -4,8 +4,9 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Helpers\Helper;
 
@@ -64,6 +65,17 @@ class User extends Authenticatable
     }
 
     /**
+     * user has replied many answered
+     *
+     * @return mixed
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+
+    /**
      * User belongs to a language
      *
      * @return mixed
@@ -71,29 +83,6 @@ class User extends Authenticatable
     public function language()
     {
         return $this->belongsTo(Language::class);
-    }
-
-    /**
-     * query scope for searching multiple keyword(s)
-     *
-     * @return mixed
-     */
-    public function scopeUserSearchByKeywords_to_removed($query, $keywords)
-    {
-        if ($keywords != '') 
-        {
-            // convert keywords from string to array. delimiter either " " or ","
-            $keywords = preg_split( '/[,\s]+/', $keywords);
-
-            $query->where(function ($query) use ($keywords) {
-                foreach ($keywords as $keyword) 
-                {
-                    $query->orwhere("name", "LIKE","%$keyword%")
-                        ->orWhere("nickname", "LIKE", "%$keyword%");
-                }
-            });
-        }
-        return $query;
     }
 
     /**
@@ -106,7 +95,7 @@ class User extends Authenticatable
         if (Helper::admin())
         {
             $key = config('cache.prefix').'AllUsers';
-            $users = Cache::remember($key, 5, function() {
+            $users = Cache::remember($key, 60, function() {
                 return static::with(['language'])->get();
             });
         } else {
@@ -132,92 +121,25 @@ class User extends Authenticatable
         return $users;
     }
 
-    public static function getNewUserCount_to_be_removed()
-    {
-        if (Helper::admin())
-        {
-            $key = config('cache.prefix').'newUserCount';  
-            $newUsers = Cache::remember($key, 60, function() {
-                return static::where('created_at', '>', Carbon::now()->subDays(14) )->count();
-            });
-        } else {
-            $newUsers = 0;
-        }
-        return $newUsers;
-    }
-
-
     /**
-     * Get Auth() Lessons detail 
+     * Setup session_data for impersonsate
      *
      * @return mixed
      */
-    public static function getSingleUser_to_be_removed()
+    public function setImpersonating($id)
     {
-        if (Auth::check())
-        {
-            $key = config('cache.prefix').'User_'.Auth::id();
-            $user = Cache::remember($key, 5, function() {
-                return static::with(['lessons','follow_courses', 'questions', 'questions.comments'])->find(Auth::id());
-            });
-        } else {
-            $user = null;
-        }
-        return $user;
+        Session::put('impersonate', $id);           // impersonsating user_id (new)
+        Session::put('original', Auth::id());       // original user_id 
     }
 
-    /**
-     * Get user (Auth::ID) Future Lesson (enrolled, and lesson has already ended)
-     *
-     * @return mixed
-     */
-    public static function getMyPastLessonCountto_be_removed()
+    public function stopImpersonating()
     {
-        if (Auth::check())
-        {  
-            $now = date('Y-m-d');
-            $count = self::getSingleUser()->lessons->where('deleted', false)->where('last_day', '<', $now)->count();
-        } else {
-            $count = 0;
-        }
-        return $count;
+        Session::forget('impersonate');
     }
 
-    /**
-     * Get user (Auth::ID) Current Lesson (lesson in session)
-     *
-     * @return mixed
-     */
-    public static function getMyCurrentLessonCountto_be_removed()
+    public function isImpersonating()
     {
-        if (Auth::check())
-        {
-            $now = date('Y-m-d');
-            $count = self::getSingleUser()->lessons->where('deleted', false)->where('first_day', '<=', $now)->where('last_day', '>=', $now)->count();
-        } else {
-            $count = 0;
-        }
-        return $count;
+        return Session::has('impersonate');
     }
-
-    /**
-     * Get user (Auth::ID) Future Lesson (enrolled, and lesson will start in future)
-     *
-     * @return mixed
-     */
-    public static function getMyFutureLessonCountto_be_removed()
-    {
-        if (Auth::check())
-        {
-            $now = date('Y-m-d');
-            $count = self::getSingleUser()->lessons->where('deleted', false)->where('first_day', '>', $now)->count();
-        } else {
-            $count = 0;
-        }
-        return $count;
-    }
-
-
-
 
 }

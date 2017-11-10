@@ -3,19 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\CourseStoreUpdate;
+use App\Helpers\Helper;
 use App\Course;
 use App\Level;
 use App\Lesson;
 use App\Question;
-use Auth;       //AT-Pending; debugging
+
+
 class CourseController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth')->only(['like', 'follow']);
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
+        $this->middleware('impersonate');
         $this->prefix = config('cache.prefix');
     }
 
@@ -24,9 +28,24 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $type=null)
     {
         $courses = Course::getAllCourses();
+
+        if ($type != null)
+        {
+            switch ($type)
+            {
+                case 'myFollowedCourses':
+                    $courses = $courses->filter(function ($value, $key) {
+                        return ($value->followed_by_users->keyBy('id')->contains(Auth::id()));
+                    });
+                    $title = 'My Followed Courses';
+                    break;
+            }
+        } else {
+            $title = 'Course Listing';
+        }
 
         if ($request->filled('keywords')) {          // query-string has "keywords"
             // convert keywords from string to array. delimiter either " " or ","
@@ -46,12 +65,19 @@ class CourseController extends Controller
                 }
                 return $matched;
             });
+            $title = $title. ' (with search)';
 
         } else {
-            $keywords = 'Search... ';                  // index & search use the same view
+            $keywords = 'Search...';                  // index & search use the same view
         }
 
-        return view('courses.index', compact(['courses', 'keywords']));
+        $now = date('Y-m-d');                       // calculate lesson_offered per course
+        foreach ($courses as $course)
+        {
+            $course->lesson_offered = $course->lessons->where('first_day', '>=', $now)->count();
+            }
+
+        return view('courses.index', compact(['courses', 'title', 'keywords']));
     }
 
     /**
@@ -112,12 +138,11 @@ class CourseController extends Controller
     {
         $course = Course::getAllCourses()->where('number', $number)->first();
 
-        if (empty($course))
+        if (empty($course) || ($course->deleted &&  !Helper::admin()))
         {
             session()->flash('messageAlertType','alert-warning');
             session()->flash('message','Course '.$number.' is not found');
             return redirect()->route('courses.index');
-
         }
 
         if (!($slug))
@@ -150,7 +175,14 @@ class CourseController extends Controller
         $questions = Question::getLastModifiedAt($questions);
         $questions = $questions->sortByDesc('last_modified_at');
 
-        return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav', 'questions']));
+        if (Auth::check() && $course->followed_by_users->keyBy('id')->contains(Auth::id()))
+        {
+            $follow = 'Followed';
+        } else {
+            $follow = 'Follow';
+        }
+
+        return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav', 'questions', 'follow']));
     }
     /**
      * Show the form for editing the specified resource.
@@ -161,7 +193,7 @@ class CourseController extends Controller
     public function edit($number)
     {
         $edit = Course::where('number', '=', $number)->first();        // pull original data
-        $levels = Level::getAllLevel();
+        $levels = Level::getAllLevels();
         
         return view('courses.edit', compact(['edit', 'levels']));
     }
@@ -218,40 +250,26 @@ class CourseController extends Controller
      */
     public function follow($course_id)
     {
+        $course = Course::getAllCourses()->where('deleted', false)->find($course_id);
 
         $user = Auth::user();
-        $followed = $user->courses()->where('id', $course_id)->exists();
+        $followed = $user->follow_courses()->where('id', $course_id)->exists();
 
-dd('under development');
-        if ($enrolled)
+        if ($followed)
         {
             session()->flash('messageAlertType','alert-warning');
-            session()->flash('message','You have enrolled previously. See you in the class');
-            // if requesting to enroll & not yet enrolled
+            session()->flash('message','You have followed already, we will send you email if there is any update');
 
         } else {
 
-            $enrolled_count = $lesson->users->count();
-            if ($lesson->quota == 0 || $enrolled_count < $lesson->quota)
-            {
-                $lesson->users()->attach(Auth::id(), ['enrolled_at' => now(), 'sequence' => $enrolled_count+1]);
-            } else {
-                $lesson->users()->attach(Auth::id(), ['waitlisted_at' => now(), 'sequence' => $enrolled_count+1]);
-            }
-            
-            $user = Auth::user();
-            $sequence = $enrolled_count+1 . '/'. $lesson->quota;
-            $message = (new EnrollLesson( $user, $lesson, $sequence));
-
-            Mail::to($user->email)->bcc('admin@bootcamp.hk')->send($message);
+            $course->followed_by_users()->attach(Auth::id(), ['created_at' => now()]);
 
             session()->flash('messageAlertType','alert-success');
-            session()->flash('message','We will send you updates');
+            session()->flash('message','We will send you email if there is any update');
         } 
 
-// to_be_removed
-/*        $key = config('cache.prefix').'User_'.Auth::id();          // for sidebar My Shortcut
-        Cache::forget($key);*/
+        $key = $this->prefix.'AllCourses';
+        Cache::forget($key);
 
         return redirect()->back();
     }

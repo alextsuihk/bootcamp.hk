@@ -4,7 +4,7 @@
 
 @section ('content')
 
-    <h2>Course Listing</h2>
+    <h2>{!! $title !!}</h2>
     <hr>
     <div class="row">
         <span class="mr-auto ml-3">
@@ -14,11 +14,15 @@
             </form>
         </span>
 
-        @if (Helper::admin())
-            <span class="ml-auto mr-3">
+        <span class="ml-auto mr-3">
+            @if ($keywords != 'Search...')
+                <a class="btn btn-info" href="{{ url()->current() }}">Clear Search</a>
+            @endif
+
+            @if (Helper::admin())
                 <a class="btn btn-primary" href="{{ route('courses.create') }}">Add Course</a>
-            </span>
-        @endif
+            @endif
+        </span>
     </div>
         
     <br>
@@ -34,9 +38,9 @@
                     <tr>
                         <th>No.</th>
                         <th>Title</th>
-                        <th>Level</th>
-                        <th>Status</th>
-                        <th>Detail</th>
+                        <th><center>Level</center></th>
+                        <th><center>Status</center></th>
+                        <th><center>Detail</center></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,17 +58,23 @@
                                     <strong>{{ str_limit($course->title, 40, ' ...') }} </strong><br>
                                     <small>{{ str_limit($course->sub_title, 70, '...') }}</small>
                                 </td>
-                                <td>{{ $course->level->difficulty }}</td>
-                                <td>
+                                <td><center>{{ $course->level->difficulty }}</center></td>
+                                <td><center>
                                     @if ($course->deleted)
                                         <span style="color:blue" title="Enrollment is closed">Disabled</span>
                                     @elseif ($course->active)
-                                        <span style="color:green" title="Enrollment is closed">Active</span>
+                                        @if ($course->lesson_offered > 0)
+                                            <a class="" style="color:green" title="Open for enrollment" 
+                                            href="{{ route('courses.show', [$course->number, str_slug($course->title)]).'/lessons' }}">
+                                            <strong>Enroll<br>now</strong></a>
+                                        @else
+                                            <span style="color:green" title="Enrollment is closed">Active</span>
+                                        @endif
                                     @else 
                                         <span style="color:red" title="Enrollment is closed">Inactive</span>
                                     @endif
-                                </td>
-                                <td>
+                                </center></td>
+                                <td><center>
                                     <a class="" data-toggle="tooltip" data-placement="top" title="View detail" 
                                     href="{{ route('courses.show', [$course->number, str_slug($course->title)]) }}">
                                     <img src="/img/info.png" alt="Info"></a> 
@@ -73,7 +83,7 @@
                                         href="{{ route('courses.edit', $course->number) }}">
                                             <img src="/img/edit.png" alt="Edit"></a>
                                     @endif
-                                </td>
+                                </center></td>
                             </tr>
                         @endif
                     @endforeach

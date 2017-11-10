@@ -16,14 +16,14 @@
 @endphp
 <p><a href="{{ url()->previous() }}" class="btn btn-success">Return to Previous Page</a></p>
 
-<div class="jumbotron ">
+<div class="card-body">
     <span class="row">
         <span class="mr-auto ml-2">
-            <h2>{{ $question->title }}</h2>
+            <h5>{{ $question->title }}</h5>
         </span>
-        <span  class="ml-auto mr-3">
+        <span  class="ml-auto mr-3"><small>
             {{ $question->created_at->diffForHumans() }} ,modified by {{ $username }}
-        </span>
+        </small></span>
     </span>
     
     <div class="form-control mceNonEditable" style="background-color: white;">
@@ -32,23 +32,22 @@
     @if ($question->course_id > 0)
     <p>
         This question is linked to Course# <a href="{{ route('courses.show', $question->course->number) }}">
-            {{ $question->course->number }} : {{ $question->course->title }}<a>
+            {{ $question->course->number }} : {{ $question->course->title }}
     </p>
     @endif
+
 
     @if (Helper::admin())
         <p>
             <div class="btn-group" role="group">
                 <a href="{{ route('questions.voteadmin', [$question->id, 'close']) }}" 
-                    class="btn btn-warning">Close</a>
+                    class="btn btn-sm btn-warning">Close</a>
                 <a href="{{ route('questions.voteadmin', [$question->id, 'blacklist']) }}" 
-                    class="btn btn-danger">Backlist</a>
+                    class="btn btn-sm btn-danger">Backlist</a>
             </div>
         </p>
     @endif
 </div>
-
-<hr>
 
 @forelse ($question->comments as $comment)
     @php
@@ -61,20 +60,24 @@
         }
     @endphp
 
-    <p>
-    <div class="card">
-      <div class="card-body">
-        <h6 class="card-title">{{ $comment->created_at->diffForHumans() }}, commented by {{ $commenter }}</h6>
-        <p class="card-text">
-                <div class="form-control mceNonEditable" style="background-color:  #e9ecef;">
-                {!! $comment->body !!}</div>
-        </p>
+    <div class="card-body">
+        <span class="row">
+            <span  class="ml-auto mr-3"><small>
+                {{ $comment->created_at->diffForHumans() }}, commented by {{ $commenter }}
+            </small></span>
+        </span>
+
+        <div class="form-control mceNonEditable" style="background-color:  #e9ecef;">
+        {!! $comment->body !!}</div>
+
         @if (Helper::admin())
-            <div class="btn-group" role="group">
-                <a href="#" class="btn btn-success" title="update table comments">Correct</a>
-                <a href="#" class="btn btn-warning" title="update table comments">Wrong</a>
-                <a href="#" class="btn btn-danger" title="">Backlist</a>
-            </div>
+            <p>
+                <div class="btn-group" role="group">
+                    <a href="#" class="btn btn-sm btn-success" title="update table comments">Correct</a>
+                    <a href="#" class="btn btn-sm btn-warning" title="update table comments">Wrong</a>
+                    <a href="#" class="btn btn-sm btn-danger" title="">Backlist</a>
+                </div>
+            </p>
         @elseif (Auth::check())
         {{-- AT-Pending: create pivot  comment_user: user_id, comment_id, vote=correct/wrong/complain --}}
 {{--             <div class="btn-group" role="group">
@@ -84,15 +87,14 @@
             </div> --}}
         @endif
       </div>
-    </div>
-    </p>
 
-@empty
-    <div class="jumbotron ">
-        No one has commented on this question
+@empty          {{-- else of @forelse --}}
+    <div class="card-body">
+        <div class="form-control mceNonEditable" style="background-color:  #e9ecef;">
+        No one has commented on this question</div>
     </div>
 
-@endforelse
+@endforelse     {{-- end of @forelse --}}
 
 <hr>
 
@@ -108,7 +110,7 @@
                 <strong>{{ $errors->first('abstract') }}</strong>
             </div>
         @endif
-        <span class="form-help">TinyMCE supports photo copy &amp; paste</span>
+        <span class="form-help">You coud copy &amp; paste screen-capture, and please use "Insert -> Code Sample" for entering codes</span>
     </div>
     <button type="submit" class="btn btn-primary">Post Your Comment</button>
 </form>

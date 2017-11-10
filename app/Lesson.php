@@ -94,16 +94,6 @@ class Lesson extends Model
         }
         return $count;
     }
-    public static function getMyCurrentLessonCount_to_be_removed()
-    {
-        $now = date('Y-m-d');
-        $key = config('cache.prefix').'user_'.Auth::id().'_myCurrentLessonCount';
-        $myCurrentLessons = Cache::remember($key, 5, function() use ($now) {
-            return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $now)->where('last_day', '>=', $now)->count();
-        });
-
-        return $myCurrentLessons;
-    }
 
     /**
      * Get user (Auth::ID) Future Lesson (enrolled, and lesson will start in future)
@@ -134,17 +124,6 @@ class Lesson extends Model
         return $count;
     }
 
-    public static function getMyFutureLessonCount_to_be_removed()
-    {
-        $now = date('Y-m-d');
-        $key = config('cache.prefix').'user_'.Auth::id().'_myFutureLessonCount';
-        $myFutureLessons = Cache::remember($key, 5, function() use ($now) {
-            return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $now)->count();
-        });
-
-        return $myFutureLessons;
-    }
-
     /**
      * Get user (Auth::ID) Future Lesson (enrolled, and lesson has already ended)
      *
@@ -172,17 +151,6 @@ class Lesson extends Model
             $count = 0;
         }
         return $count;
-    }
-
-    public static function getMyPastLessonCount_to_be_removed()
-    {
-        $now = date('Y-m-d');
-        $key = config('cache.prefix').'user_'.Auth::id().'_myPastLessonCount';
-        $myPastLessons = Cache::remember($key, 5, function() use ($now) {
-            return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('last_day', '<', $now)->count();
-        });
-
-        return $myPastLessons;
     }
 
     /**

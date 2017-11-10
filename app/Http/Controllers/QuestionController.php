@@ -17,6 +17,7 @@ class QuestionController extends Controller
     {
         $this->middleware('admin')->only(['voteadmin']);
         $this->middleware('auth')->only(['store', 'vote']);
+        $this->middleware('impersonate');
         $this->prefix = config('cache.prefix');
     }
 
@@ -37,8 +38,7 @@ class QuestionController extends Controller
 
         } elseif ($nav =='myNewComments') {
             $questions = $questions->where('user_id', Auth::id())->filter(function ($value, $key) {
-                if (($value->comments->where('viewed', false))->isNotEmpty())
-                    { return $value; }
+                 return $value->comments->where('viewed', false)->isNotEmpty();
             });
             $title = 'New Comments for My Questions';
 
@@ -48,8 +48,7 @@ class QuestionController extends Controller
 
         } elseif ($nav == 'unanswered') {
             $questions = $questions->filter(function ($value, $key) {
-                if ($value->comments->isEmpty())
-                    { return $value; }
+                return $value->comments->isEmpty();
             });
             $title = 'Unanswered Questions';
 
@@ -58,7 +57,10 @@ class QuestionController extends Controller
             $title = 'Opened Questions';
         }
 
-        if ( !is_null($request->keywords)) {
+        if (is_null($request->keywords)) {
+            $keywords = 'Search ....';
+            
+        }else {
             $keywords = preg_split( '/[,\s]+/', $request->keywords);        //convert string to array
 
             // AT-Pend: the following block looks stupid, let re-factor and make it pretty
@@ -72,7 +74,7 @@ class QuestionController extends Controller
                     } else {
                         // if quetions->title & question->body NOT contain keyword, look into each comments
                         foreach ($value->comments as $comment) {
-                            if (strpos($comment->body, $keyword) !==false && $contains == false)
+                            if (strpos($comment->body, $keyword) !==false)
                             {
                                 $contains = true;
                                 break;
@@ -85,6 +87,7 @@ class QuestionController extends Controller
                 }
             });
             $title = $title.' (with search)';
+            $keywords = $request->keywords;         // workaround: to restore $keyword in case there is a search
         }
 
 
@@ -93,7 +96,7 @@ class QuestionController extends Controller
 
         $questions = $questions->sortByDesc('last_modified_at');
 
-        $keywords = $request->keywords;         // workaround: to restore $keyword in case there is a search
+        
 
         return view('questions.index', compact(['title','nav', 'questions', 'keywords']));
     }
@@ -171,8 +174,11 @@ class QuestionController extends Controller
             return redirect($url); 
         }
 
+        if ($question->user_id == Auth::id())
+        {
+            Comment::clearViewedFlag($id);      // if you ask the question, clear comments.viewed flag
+        }
         // clear comments.viewed flag
-        Comment::clearViewedFlag($id);
 
         return view('questions.show', compact(['question']));
     }

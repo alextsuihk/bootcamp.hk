@@ -35,7 +35,7 @@
 {{--         <input type="email" class="form-control" id="email" name="email" 
         value="{{ Helper::old('email', $user) }}"  disabled}>
  --}}        
-        <span class="form-help">If you wish to change email, pls send email to admin@bootcamp.hk</span>
+        <span class="form-help">If you wish to change email, pls send email to {{ config('mail.admin_email') }}</span>
     </div>
 
     <div class="form-group">

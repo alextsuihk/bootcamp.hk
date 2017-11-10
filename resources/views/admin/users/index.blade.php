@@ -4,7 +4,7 @@
 
 @section ('content')
 
-    <h2>Users </h2>
+    <h2>Users Management</h2>
     <hr>
     <div class="row">
         <span class="mr-auto ml-3">
@@ -12,6 +12,12 @@
                 <input class="form-control " type="search" id="keywords" name="keywords" placeholder="{{ $keywords }}" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
+        </span>
+
+        <span class="ml-auto mr-3">
+            @if ($keywords != 'Search...')
+                <a class="btn btn-info" href="{{ url()->current() }}">Clear Search</a>
+            @endif
         </span>
     </div>
         
@@ -24,7 +30,7 @@
                     <th>No.</th>
                     <th></th>
                     <th>Nickname</th>
-                    <th>Anon</th>
+                    <th><small>Anonymous</small></th>
                     <th>Email<br>Mobile</th>
                     <th>FB</th>
                     <th></th>
@@ -35,13 +41,13 @@
             <tbody>
                 @foreach ($users as $user)
                     <tr>
-                        <td>
+                        <td><small>
                             @if ($user->disabled)
                                 <span style="color:red;"><strong>{{ $user->id}}</strong><br>(disabled)</span>
                             @else
                                 <strong>{{ $user->id}}</strong>
                             @endif
-                        </a></td>
+                        </small></td>
                         <td><img src="{{ $user->avatar }}" height="25"></td>
                         <td>{{ $user->name }} <br><small>{{ $user->nickname }}</small></td>
                         <td><?php echo ($user->anonymous)?'<img src="/img/anonymous.png">':'' ;?></td>
@@ -57,7 +63,7 @@
                         <td><small>{{ $user->created_at->diffForHumans() }}
                             <br>{{ $user->updated_at->diffForHumans() }}</small></td>
                         <td>
-                        <a class="btn btn-primary" href="{{ route('admin.users.show', $user->id) }}">Settings</a>
+                        <a class="" href="{{ route('admin.users.edit', $user->id) }}"><img src="/img/setting.png"></a>
                         </td>
                     </tr>
 

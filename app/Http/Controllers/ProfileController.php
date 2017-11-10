@@ -17,6 +17,8 @@ class ProfileController extends Controller
     {
         //$this->middleware('admin')->only(['show']);
         $this->middleware('auth')->only(['sendemailverify', 'edit', 'update']);
+        $this->middleware('impersonate');
+        $this->prefix = config('cache.prefix');
     }
 
     /**
@@ -133,6 +135,9 @@ class ProfileController extends Controller
         $user->nickname = $validatedData['nickname'];
         $user->mobile = $validatedData['mobile'];
         $user->save();
+
+        $key = $this->prefix.'AllUsers';
+        Cache::forget($key);        // flush 'courses' cache (no need to wait to expire)
 
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','User profile is updated');

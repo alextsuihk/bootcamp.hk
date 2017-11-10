@@ -31,11 +31,6 @@
                 </li>
             </ul>
         </span>
-        {{-- AT-Pending: enable like & follow later --}}
-{{--         <span class="ml-auto mr-5">
-            <a class="" href="{{ route('courses.like', [$course->id]) }}"><img src="/img/thumbs-up.png" alt="like"></a>
-            <a class="btn btn-primary" title="notify you when there is an update and new question is posted" href="{{ route('courses.follow', [$course->id]) }}">Follow</a>
-        </span> --}}
     </div>
     {{-- end of creating a nav-tab --}}
 
@@ -43,7 +38,7 @@
         <div class="row">
             <span class="mr-auto ml-3"><h2>Course Detail</h2></span>
             <span class="ml-auto mr-5">
-                <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}" title="To receive update">Follow</a>
+                <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}" title="To receive update">{{ $follow }}</a>
                 @if (Helper::admin())
                     <a class="" data-toggle="tooltip" data-placement="top" title="Edit" 
                     href="{{ route('courses.edit', $course->number) }}">

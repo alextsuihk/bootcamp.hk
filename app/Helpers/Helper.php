@@ -11,7 +11,7 @@ class Helper
         if (Auth::check() && Auth::user()->disabled) {
             session()->flash('messageAlertType','alert-danger');
             session()->flash('message','Your account has been disabled. <br>Please contact system administrator 
-                <a href="mailto:admin@bootcamp.hk?Subject=Account Disabled ('.Auth::id().')" target="_top">(admin@bootcamp.hk)</a>');
+                <a href="mailto:'.config('mail.admin_email').'?Subject=Account Disabled ('.Auth::id().')" target="_top">('.config('mail.admin_email').')</a>');
             Auth::logout();
             return redirect('/');
         }

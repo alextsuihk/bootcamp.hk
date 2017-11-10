@@ -6,7 +6,7 @@
     Hello, {{ $user->name }}
 @endisset
 
-@if ($waitlisted)
+@if (isset($waitlisted) && $waitlisted == true)
 The class is full. You are currently put on waiting list. If anyone has cancelled enrollment, you will be promoted. please visit our website regularly.
 @else 
 You have sucessfully enrolled the following class.

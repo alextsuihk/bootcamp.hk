@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class Course extends Model
@@ -56,7 +57,7 @@ class Course extends Model
      *
      * @return mixed
      */
-    public function follow_users()
+    public function followed_by_users()
     {
         return $this->belongsToMany(User::class, 'course_user_follow');
     }
@@ -70,11 +71,38 @@ class Course extends Model
     {
         $key = config('cache.prefix').'AllCourses';
         $courses = Cache::remember($key, 5, function() {
-            return Course::with(['level', 'follow_users', 'attachments', 'attachments.attachment_revisions'])
-            ->with(['attachments.attachment_revisions'])->orderBy('number')->get();
+            return Course::with(['level', 'followed_by_users', 'attachments', 'attachments.attachment_revisions', 
+                'lessons'])->with(['attachments.attachment_revisions'])->orderBy('number')->get();
             });                                 // enable eager loading + cache
 
         return $courses;
+    }
+
+    /**
+     * Get user (Auth::ID) Course Followed
+     *
+     * @return mixed
+     */
+    public static function getMyFollowedCourseCount()
+    {
+        if (Auth::check())
+        {
+            $count = static::getAllCourses()->where('deleted', false)->filter( function ($value ,$key) {
+                    $matched = false;
+                    foreach ($value->followed_by_users as $user)
+                    {
+                        if ($user->id == Auth::id())
+                        {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                    return $matched;
+                })->count();
+        } else {
+            $count = 0;
+        }
+        return $count;
     }
 
 }

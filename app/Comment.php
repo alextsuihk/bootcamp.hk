@@ -43,17 +43,6 @@ class Comment extends Model
      *
      * @return mixed
      */
-    public static function getMyNewCommentCount_to_be_removed()
-    {
-        $key = config('cache.prefix').'user_'.Auth::id().'_myNewCommentCount';  
-        $myNewComments = Cache::remember($key, 5, function() {
-            return static::with(['question' => function ($query) {
-                $query->where('user_id', Auth::id() );
-            }])->where('viewed', false)->count();
-        });
-
-        return $myNewComments;
-    }
     public static function getMyNewCommentCount()
     {
         if (Auth::check())

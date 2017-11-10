@@ -4,11 +4,15 @@
     </div>
 @else   
 
-    <div>
+{{-- AT-Pending: will do sorting late --}}
+{{--     <div>
         Sort By:
-        <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=course.title' }}">Title</a>
+        @if ($showCourseTitle)
+            <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=course.title' }}">Title</a>
+        @endif
         <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=first_day' }}">First Day</a>
     </div>
+    <br> --}}
 
     <div class="table-responsive">
         <table class="table table-striped">
@@ -56,7 +60,7 @@
                         @if ($position > $lesson->quota)
                             <?php $status = $status.'<br>waitlisted(#'. ($position - $lesson->quota) .')'; ?>
                         @else
-                            <?php $status = $status.'<br>enrolled'; ?>
+                            <?php $status = $status.'<br><strong>enrolled</strong>'; ?>
                         @endif
 
                     @else

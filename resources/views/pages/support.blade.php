@@ -3,5 +3,5 @@
 @section ('title', 'Support')
 
 @section ('content')
-    Placeholder for support, for meantime, please email us admin@bootcamp.hk
+    Placeholder for support, for meantime, please email us {{ config('mail.admin_email') }}
 @endsection

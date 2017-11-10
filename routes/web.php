@@ -19,14 +19,15 @@ Route::get('contactus', 'PageController@getContactUs');*/
 //AT-Pending: go ahead & remove PageController
 Route::view('aboutus', 'pages/aboutus');
 Route::view('contactus', 'pages/contactus');
-Route::view('contactus', 'pages/support');
+Route::view('support', 'pages/support');
 /**
  * Courses Controller
  */
 
 Route::resource('courses', 'CourseController', ['only' =>[
-    'index','create','store', 'edit','update'
+    'create','store', 'edit','update'
 ]]);
+Route::get('courselist/{type?}', 'CourseController@index')->name('courses.index');
 Route::get('courses/{course}/{slug?}/{nav?}', 'CourseController@show')->name('courses.show');
 Route::get('course_like/{id}', 'CourseController@like')->name('courses.like');
 Route::get('course_follow/{id}', 'CourseController@follow')->name('courses.follow');
@@ -82,21 +83,15 @@ Route::redirect('logout', '/');
 Auth::routes();
 
 
-
 /**
  * Admin Controller
  */
 Route::get('admin/users/', 'Admin\UserController@index')->name('admin.users.index'); 
-Route::get('admin/users/{id}', 'Admin\UserController@show')->name('admin.users.show'); 
+Route::get('admin/users/{id}/edit', 'Admin\UserController@edit')->name('admin.users.edit');
+Route::post('admin/users/{id}', 'Admin\UserController@update')->name('admin.users.update');
 Route::get('admin/impersonate/{id}', 'Admin\UserController@impersonate')->name('admin.users.impersonate');
-Route::get('admin/umpersonate', 'Admin\UserController@unimpersonate')->name('admin.users.unimpersonate');
-/*Route::get('admin/users', 'Admin\PageController@getContactUs');
-*/
+Route::get('admin/stopimpersonate', 'Admin\UserController@stopImpersonate')->name('admin.users.stopImpersonate');
 
 
-/*Route::get('/', function () {
-    return redirect('courses');
-})->name('home');
-*/
-Route::redirect('/', 'courses')->name('home');            // redirect "/" to "/courses"
+Route::redirect('/', 'courselist')->name('home');            // redirect "/" to "/courses"
 

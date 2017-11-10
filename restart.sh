@@ -1,5 +1,12 @@
 php artisan cache:clear
+php artisan config:clear
+php artisan debugbar:clear
+php artisan route:clear
+php artitsan view:clear
+php artisan route:clear
+
 php artisan migrate:fresh --seed
+
 #php artisan migrate:fresh
 #php artisan db:seed
 

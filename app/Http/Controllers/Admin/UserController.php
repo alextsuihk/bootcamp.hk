@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 use App\User;
 
 class UserController extends Controller
@@ -13,6 +15,8 @@ class UserController extends Controller
     {
         $this->middleware('admin');
         $this->prefix = config('cache.prefix');
+        $key = $this->prefix.'AllUsers';
+        Cache::forget($key);
     }
 
     /**
@@ -61,28 +65,6 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -90,7 +72,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::with(['lessons', 'questions', 'comments', 'follow_courses'])->find($id);
+        return view('admin.users.edit', compact(['user']));
     }
 
     /**
@@ -102,17 +85,61 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'nickname' => 'sometimes|max:20',
+            'name'     => 'required|max:20',
+            'email'    => 'required|email',
+            'mobile'   => 'nullable|digits:8',
+            'disabled' => 'sometimes',
+        ]);
+
+        $count = User::where('mobile', $validatedData['mobile'])->where('id', '!=', $id)->count();
+        if ($count > 0)
+        {
+            return redirect()->back()
+                        ->withErrors(['mobile' => 'The mobile phone is using used by another person'])
+                        ->withInput();
+        }
+
+        $user = User::getAllUsers()->find($id);
+
+        $user->nickname = $validatedData['nickname'];
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->mobile = $validatedData['mobile'];
+        $user->disabled = ($request->disabled ? true : false );
+        $user->save();
+
+
+        $key = $this->prefix.'AllUsers';
+        Cache::forget($key);        // flush 'courses' cache (no need to wait to expire)
+
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message','User detail is updated');
+        return redirect()->route('admin.users.edit', $user->id);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified resource in storage.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function impersonate($id)
     {
-        //
+        Auth::user()->setImpersonating($id);
+        return redirect()->route('courses.index');
     }
+
+    public function stopImpersonate()
+    {
+        Auth::user()->stopImpersonating();
+
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message','<center><strong>Exited Impersonation Mode, return to normal</strong></center>');
+
+        return redirect()->back();
+    }
+
 }

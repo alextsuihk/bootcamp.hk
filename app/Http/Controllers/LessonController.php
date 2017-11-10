@@ -21,6 +21,7 @@ class LessonController extends Controller
     {
         $this->middleware('auth')->only(['enroll', 'cancel']);
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
+        $this->middleware('impersonate');
         $this->prefix = config('cache.prefix');
     }
 
@@ -45,32 +46,29 @@ class LessonController extends Controller
                     $title = 'New Class Offerings';
                     break;
                 case 'myPastLessons':
-/*                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('last_day', '<', $today)->get();*/
                     $lessons = $lessons->where('deleted', false)->where('last_day', '<', $today)
                     ->where('last_day', '>=', $today);
                     $lessons = $lessons->filter(function ($value, $key) {
                         return ($value->users->keyBy('id')->contains(Auth::id()));
                     });
 
-                    $title = 'My Active Classes';
+                    $title = 'My Past Lessons';
                     break;
                 case 'myCurrentLessons':
-/*                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $today)->where('last_day', '>=', $today)->get();*/
                     $lessons = $lessons->where('deleted', false)->where('first_day', '<=', $today)
                     ->where('last_day', '>=', $today);
                     $lessons = $lessons->filter(function ($value, $key) {
                         return ($value->users->keyBy('id')->contains(Auth::id()));
                     });
-                    $title = 'My Active Classes';
+                    $title = 'My Current Lessons';
                     break;
                 case 'myFutureLessons':
-/*                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $today)->get();*/
                     $lessons = $lessons->where('deleted', false)->where('first_day', '>', $today)
                     ->where('last_day', '>=', $today);
                     $lessons = $lessons->filter(function ($value, $key) {
                         return ($value->users->keyBy('id')->contains(Auth::id()));
                     });
-                    $title = 'My Enrolled Classes';
+                    $title = 'My Enrolled Lessons';
                     break;
             }
         }
@@ -134,19 +132,15 @@ class LessonController extends Controller
                 session()->flash('message', $msg);
             }
             
-            $user->lessons()->attach($lesson_id, ['enrolled_at' => now(), 'waitlisted' => $waitlisted]);
+            $user->lessons()->attach($lesson_id, ['enrolled_at' => now()]);
             $sequence = $enrolledCount+1 . '/'. $lesson->quota;
             $message = (new EnrollLesson( $user, $lesson, $waitlisted, $sequence));
 
-            Mail::to($user->email)->bcc('admin@bootcamp.hk')->send($message);
+            Mail::to($user->email)->bcc(config('mail.admin_email'))->send($message);
         } 
 
         $key = config('cache.prefix').'AllLessons';
         Cache::forget($key);
-
-// to_be_removed
-/*        $key = config('cache.prefix').'User_'.Auth::id();
-        Cache::forget($key);*/
 
         return redirect()->back();
     }
@@ -178,10 +172,6 @@ class LessonController extends Controller
 
         $key = config('cache.prefix').'AllLessons';
         Cache::forget($key);
-
-// to_be_removed
-/*        $key = config('cache.prefix').'User_'.Auth::id();
-        Cache::forget($key);*/
 
         return redirect()->back();
     }
