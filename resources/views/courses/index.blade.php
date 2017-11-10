@@ -16,7 +16,7 @@
 
         @if (Helper::admin())
             <span class="ml-auto mr-3">
-                <a class="btn btn-primary" href="{{ url()->current()."?sortBy=course.title" }}">Add Course</a>
+                <a class="btn btn-primary" href="{{ route('courses.create') }}">Add Course</a>
             </span>
         @endif
     </div>
@@ -50,7 +50,10 @@
                                     <td><a href="{{ route('courses.show', $course->number) }}">
                                         {{ $course->number }}</a></td>
                                 @endif
-                                <td><strong>{{ str_limit($course->title, 40, ' ...') }} </strong></td>
+                                <td>
+                                    <strong>{{ str_limit($course->title, 40, ' ...') }} </strong><br>
+                                    <small>{{ str_limit($course->sub_title, 70, '...') }}</small>
+                                </td>
                                 <td>{{ $course->level->difficulty }}</td>
                                 <td>
                                     @if ($course->deleted)

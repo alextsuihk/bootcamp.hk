@@ -28,13 +28,19 @@ show My_Question: no of unread answered
             <span class="nav-link"><strong>My Dashboard</strong></span>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('questions.index', ['type'=>'myQuestions']) }}">Questions&nbsp;
+            <a class="nav-link" href="{{ route('questions.index', ['type'=>'myQuestions']) }}">My Questions&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myQuestions }}</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ route('questions.index', ['type'=>'myNewComments']) }}">New Comments&nbsp;
                 <span class="badge badge-pill badge-info">{{ $myNewComments }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('lessons.index', ['type'=>'myPastLessons']) }}">
+                Past Classes&nbsp;
+                <span class="badge badge-pill badge-info">{{ $myPastLessons }}</span>
             </a>
         </li>
         <li class="nav-item">
@@ -71,7 +77,7 @@ show My_Question: no of unread answered
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">New Questions&nbsp;
+        <a class="nav-link" href="{{ route('questions.index', ['type'=>'newQuestions']) }}" title="Question asked pasted 2 weeks">New Questions&nbsp;
             <span class="badge badge-pill badge-info">{{ $newQuestions }}</span>
         </a>
     </li>

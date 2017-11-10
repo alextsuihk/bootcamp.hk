@@ -15,11 +15,11 @@
             @include ('partials.nav')
 
             <div class="row">
-                <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+                <nav class="col-sm-3 col-md-3 d-none d-sm-block bg-light sidebar">
                     @include ('partials.sidebar')
                 </nav>
 
-                <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
+                <main class="col-sm-9 ml-sm-auto col-md-9 pt-3" role="main">
                     @include ('partials.impersonate')
                     @include ('partials.message')
                     @yield ('content')

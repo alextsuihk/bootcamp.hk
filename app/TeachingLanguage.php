@@ -14,7 +14,8 @@ class TeachingLanguage extends Model
      */
     public static function getAllTeachingLanguage()
     {
-        $levels = Cache::remember('TeachLanguageAll', 60, function() {
+        $key = config('cache.prefix').'TeachLanguageAll';
+        $levels = Cache::remember($key, 60, function() {
             return static::all()->sortBy('id');
         });
 

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\LessonStoreUpdate;
-use Carbon\Carbon;
 use App\Lesson;
 use App\Course;
 use App\Level;
@@ -32,12 +31,9 @@ class LessonController extends Controller
      */
     public function index(Request $request, $type=null)
     {
-        $key = $this->prefix.'AllLesssons';
-        $lessons = Cache::remember($key, 5, function() {
-            return Lesson::with(['teaching_language','course','course.level', 'users'])
-            ->where('deleted', false)->get()->sortBy('first_day');
-        });
+        $lessons = Lesson::getAllLessons();
         $title = 'All Class Offerings';
+
 
         $today = date('Y-m-d');
         if ($type != null)
@@ -48,12 +44,32 @@ class LessonController extends Controller
                     $lessons = $lessons->where('first_day', '>', $today);
                     $title = 'New Class Offerings';
                     break;
+                case 'myPastLessons':
+/*                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('last_day', '<', $today)->get();*/
+                    $lessons = $lessons->where('deleted', false)->where('last_day', '<', $today)
+                    ->where('last_day', '>=', $today);
+                    $lessons = $lessons->filter(function ($value, $key) {
+                        return ($value->users->keyBy('id')->contains(Auth::id()));
+                    });
+
+                    $title = 'My Active Classes';
+                    break;
                 case 'myCurrentLessons':
-                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $today)->where('last_day', '>=', $today)->get();
+/*                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $today)->where('last_day', '>=', $today)->get();*/
+                    $lessons = $lessons->where('deleted', false)->where('first_day', '<=', $today)
+                    ->where('last_day', '>=', $today);
+                    $lessons = $lessons->filter(function ($value, $key) {
+                        return ($value->users->keyBy('id')->contains(Auth::id()));
+                    });
                     $title = 'My Active Classes';
                     break;
                 case 'myFutureLessons':
-                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $today)->get();
+/*                    $lessons = Lesson::with(['teaching_language','course','course.level', 'users'])->leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $today)->get();*/
+                    $lessons = $lessons->where('deleted', false)->where('first_day', '>', $today)
+                    ->where('last_day', '>=', $today);
+                    $lessons = $lessons->filter(function ($value, $key) {
+                        return ($value->users->keyBy('id')->contains(Auth::id()));
+                    });
                     $title = 'My Enrolled Classes';
                     break;
             }
@@ -70,7 +86,7 @@ class LessonController extends Controller
             }
 
         } else {
-            $lessons = $lessons->sortBy('first_day');
+            $lessons = $lessons->sortByDesc('first_day');
         }
 
         return view('lessons.index', compact(['lessons', 'title']));
@@ -84,39 +100,53 @@ class LessonController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function enroll($lesson_id)
-    {
-        $lesson = Lesson::with('course')->where('deleted', false)->find($lesson_id);    
+    { 
+        $lesson = Lesson::getAllLessons()->where('deleted', false)->where('active', true)->find($lesson_id);
                                             // get $lesson instance, if disabled, cannot enroll
-        $enrolled = $lesson->users()->where('id', Auth::id())->exists();
+        if ($lesson == null)
+        {
+            session()->flash('messageAlertType','alert-warning');
+            session()->flash('message','This lesson is NOT available for enrollment');
+            return redirect()->back();
+        }
+
+        $user = Auth::user();
+        $enrolled = $user->lessons()->where('id', $lesson_id)->exists();
 
         if ($enrolled)
         {
             session()->flash('messageAlertType','alert-warning');
             session()->flash('message','You have enrolled previously. See you in the class');
             // if requesting to enroll & not yet enrolled
+
         } else {
-            $lesson->users()->attach(Auth::id(), ['enrolled_at' => now()]);
+
+            $enrolledCount = $lesson->users->count();
+            if ($lesson->quota == 0 || $enrolledCount < $lesson->quota)
+            {
+                $waitlisted = false;
+                session()->flash('messageAlertType','alert-success');
+                session()->flash('message','Lesson is enrolled successfully. See you in the class');
+            } else {
+                $waitlisted = true;
+                session()->flash('messageAlertType','alert-warning');
+                $msg = 'Lesson is full. You are on waiting list, queue position: '.($enrolledCount - $lesson->quota + 1);
+                session()->flash('message', $msg);
+            }
             
-            $user = Auth::user();
-            $message = (new EnrollLesson( $user, $lesson));
+            $user->lessons()->attach($lesson_id, ['enrolled_at' => now(), 'waitlisted' => $waitlisted]);
+            $sequence = $enrolledCount+1 . '/'. $lesson->quota;
+            $message = (new EnrollLesson( $user, $lesson, $waitlisted, $sequence));
 
-            Mail::to($user->email)->queue($message);
-
-            session()->flash('messageAlertType','alert-success');
-            session()->flash('message','Lesson is enrolled successfully. See you in the class');
+            Mail::to($user->email)->bcc('admin@bootcamp.hk')->send($message);
         } 
 
-        $key = 'user_'.Auth::id().'_myCurrentLessons';          // for sidebar My Shortcut
+        $key = config('cache.prefix').'AllLessons';
         Cache::forget($key);
 
-        $key = 'user_'.Auth::id().'_myFutureLessons';
-        Cache::forget($key);
-
-        $key = $this->prefix.'AllLesssons';
-        Cache::forget($key);
-
-        $key = $this->prefix.'Course_'.$lesson->course->number;  
-        Cache::forget($key);                // forget this key (course_number), because of nested eager loading
+// to_be_removed
+/*        $key = config('cache.prefix').'User_'.Auth::id();
+        Cache::forget($key);*/
 
         return redirect()->back();
     }
@@ -128,13 +158,15 @@ class LessonController extends Controller
      */
     public function cancel($lesson_id)
     {
-        $lesson = Lesson::with('course')->find($lesson_id);    
+        $lesson = Lesson::getAllLessons()->where('active', true)->find($lesson_id);
                             // get $lesson instance (even lesson is disabled, still allow cancellation)
-        $enrolled = $lesson->users()->where('id', Auth::id())->exists();
+
+        $user = Auth::user();
+        $enrolled = $user->lessons()->where('id', $lesson_id)->exists();
 
         if ($enrolled)
         {
-            $lesson->users()->detach(Auth::id());
+            $user->lessons()->detach($lesson_id);
             // AT-Pending: queue email to user, cc enrollment@bootcamp.hk
             session()->flash('messageAlertType','alert-info');
             session()->flash('message','Your enrollment is cancelled');
@@ -144,17 +176,12 @@ class LessonController extends Controller
             session()->flash('message','Something is wrong, please contact system admin');
         }
 
-        $key = 'user_'.Auth::id().'_myCurrentLessons';          // for sidebar My Shortcut
+        $key = config('cache.prefix').'AllLessons';
         Cache::forget($key);
 
-        $key = 'user_'.Auth::id().'_myFutureLessons';
-        Cache::forget($key);
-
-        $key = $this->prefix.'AllLesssons';
-        Cache::forget($key);
-
-        $key = $this->prefix.'Course_'.$lesson->course->number;  
-        Cache::forget($key);                // forget this key (course_number), because of nested eager loading
+// to_be_removed
+/*        $key = config('cache.prefix').'User_'.Auth::id();
+        Cache::forget($key);*/
 
         return redirect()->back();
     }
@@ -208,13 +235,13 @@ class LessonController extends Controller
         ]);
         $lesson->save();
 
-        $key = $this->prefix.'AllLesssons';
+        $key = $this->prefix.'AllLessons';
         Cache::forget($key);
 
-        $key = $this->prefix.'Course_'.$lesson->course->number;
-        Cache::forget($key);
+        $key = 'lesson_'.$lesson->course_id;
+        Cache::forget($key); 
 
-        $key = 'newLessons';
+        $key = 'newLessonCount';
         Cache::forget($key);
 
         session()->flash('messageAlertType','alert-success');
@@ -278,15 +305,15 @@ class LessonController extends Controller
 
         $lesson->save();
 
-        $key = $this->prefix.'AllLesssons';
+        $key = $this->prefix.'AllLessons';
         Cache::forget($key);
 
-        $key = 'newLessons';
-        Cache::forget($key);
+        $key = 'lesson_'.$lesson->course_id;
+        Cache::forget($key); 
 
-        $key = $this->prefix.'Course_'. $lesson->course->number;
+        $key = 'newLessonCount';
         Cache::forget($key);
-
+ 
         session()->flash('messageAlertType','alert-success');
         session()->flash('message','Course detail is updated');
 

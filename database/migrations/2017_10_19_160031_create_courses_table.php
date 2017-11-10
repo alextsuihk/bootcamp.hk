@@ -17,6 +17,7 @@ class CreateCoursesTable extends Migration
             $table->increments('id');
             $table->string('number', 3)->unique();         // e.g. 101, 201
             $table->string('title',50);
+            $table->string('sub_title',100)->nullable();
             $table->mediumText('abstract');
             $table->integer('level_id')->unsigned()->default(21); 
             $table->foreign('level_id')->references('id')->on('levels');

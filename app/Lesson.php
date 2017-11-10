@@ -40,9 +40,30 @@ class Lesson extends Model
         return $this->belongsTo(TeachingLanguage::class);
     }
 
+    /**
+     * course has been enrolled by many users (pivot table lesson_user)
+     *
+     * @return mixed
+     */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'lesson_user');
+        return $this->belongsToMany(User::class, 'lesson_user')->as('enrollment')->withPivot('enrolled_at');
+    }
+
+    /**
+     * Get All Lessons detail 
+     *
+     * @return mixed
+     */
+    public static function getAllLessons()
+    {
+        $key = config('cache.prefix').'AllLessons';
+        $lessons = Cache::remember($key, 5, function() {
+            return static::with(['teaching_language','course','course.level', 'users'])
+                ->orderByDesc('first_day')->get();
+        });
+
+        return $lessons;
     }
 
     /**
@@ -50,10 +71,33 @@ class Lesson extends Model
      *
      * @return mixed
      */
-    public static function getMyCurrentLessons()
+    public static function getMyCurrentLessonCount()
+    {
+        if (Auth::check())
+        {
+            $now = date('Y-m-d');
+            $count = static::getAllLessons()->where('deleted', false)->where('first_day', '<=', $now)
+                ->where('last_day', '>=', $now)->filter( function ($value ,$key) {
+                    $matched = false;
+                    foreach ($value->users as $user)
+                    {
+                        if ($user->id == Auth::id())
+                        {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                    return $matched;
+                })->count();
+        } else {
+            $count = 0;
+        }
+        return $count;
+    }
+    public static function getMyCurrentLessonCount_to_be_removed()
     {
         $now = date('Y-m-d');
-        $key = 'user_'.Auth::id().'_myCurrentLessons';
+        $key = config('cache.prefix').'user_'.Auth::id().'_myCurrentLessonCount';
         $myCurrentLessons = Cache::remember($key, 5, function() use ($now) {
             return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '<=', $now)->where('last_day', '>=', $now)->count();
         });
@@ -66,10 +110,34 @@ class Lesson extends Model
      *
      * @return mixed
      */
-    public static function getMyFutureLessons()
+    public static function getMyFutureLessonCount()
+    {
+        if (Auth::check())
+        {
+            $now = date('Y-m-d');
+            $count = static::getAllLessons()->where('deleted', false)->where('first_day', '>', $now)
+                ->filter( function ($value ,$key) {
+                    $matched = false;
+                    foreach ($value->users as $user)
+                    {
+                        if ($user->id == Auth::id())
+                        {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                    return $matched;
+                })->count();
+        } else { 
+            $count = 0;
+        }
+        return $count;
+    }
+
+    public static function getMyFutureLessonCount_to_be_removed()
     {
         $now = date('Y-m-d');
-        $key = 'user_'.Auth::id().'_myFutureLessons';
+        $key = config('cache.prefix').'user_'.Auth::id().'_myFutureLessonCount';
         $myFutureLessons = Cache::remember($key, 5, function() use ($now) {
             return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('first_day', '>', $now)->count();
         });
@@ -78,15 +146,54 @@ class Lesson extends Model
     }
 
     /**
+     * Get user (Auth::ID) Future Lesson (enrolled, and lesson has already ended)
+     *
+     * @return mixed
+     */
+    public static function getMyPastLessonCount()
+    {
+        if (Auth::check())
+        {
+            $now = date('Y-m-d');
+            $count = static::getAllLessons()->where('deleted', false)->where('last_day', '<', $now)
+                ->filter( function ($value ,$key) {
+                    $matched = false;
+                    foreach ($value->users as $user)
+                    {
+                        if ($user->id == Auth::id())
+                        {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                    return $matched;
+                })->count();
+        } else { 
+            $count = 0;
+        }
+        return $count;
+    }
+
+    public static function getMyPastLessonCount_to_be_removed()
+    {
+        $now = date('Y-m-d');
+        $key = config('cache.prefix').'user_'.Auth::id().'_myPastLessonCount';
+        $myPastLessons = Cache::remember($key, 5, function() use ($now) {
+            return static::leftJoin('lesson_user', 'lesson_id', '=', 'id')->where('lesson_user.user_id', Auth::id())->where('deleted', false)->where('last_day', '<', $now)->count();
+        });
+
+        return $myPastLessons;
+    }
+
+    /**
      * Get Future Lesson Count (start_day after today)
      *
      * @return mixed
      */
-    public static function getNewLessons()
+    public static function getNewLessonCount()
     {
         $now = date('Y-m-d');
-        $key = 'newLessons';
-        
+        $key = config('cache.prefix').'newLessonCount';
         $newLessons = Cache::remember($key, 5, function() use ($now) {
             return static::where('deleted', false)->where('first_day', '>', $now)->count();
         });
@@ -99,9 +206,9 @@ class Lesson extends Model
      *
      * @return mixed
      */
-    public static function getAllLessons()
+    public static function getAllLessonCount()
     {
-        $key = 'allLessons';   
+        $key = config('cache.prefix').'allLessonCount';   
         $newLessons = Cache::remember($key, 5, function() {
             return static::all()->count();
         });

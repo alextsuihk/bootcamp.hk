@@ -27,7 +27,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-form-label form-label" for="instructor">Instructor:</label>
+        <label class="col-form-label form-label" for="instructor">Host:</label>
         <input type="text" class="form-control" id="instructor" name="instructor" 
         value="{{ Helper::old('instructor', $edit) }}" {{ $disabled }}>
         @if ($type != 'show')
@@ -36,7 +36,7 @@
                     <strong>{{ $errors->first('instructor') }}</strong>
                 </div>
             @endif
-            <span class="form-help">Instructor name</span>
+            <span class="form-help">Host name</span>
         @endif
     </div>
 

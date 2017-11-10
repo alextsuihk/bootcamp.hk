@@ -68,8 +68,9 @@ class AttachmentController extends Controller
                 'revision' => $currRevision+1,
             ]);
 
-            $key = $this->prefix.'Course_'.$request->course_number;  
+            $key = $this->prefix.'AllCourses'; 
             Cache::forget($key);                // forget this key (course_number)
+            
             session()->flash('messageAlertType','alert-sucess');
             session()->flash('message','File is uploaded sucessfully');
             return redirect()->back();
@@ -114,7 +115,7 @@ class AttachmentController extends Controller
                 $file->disabled = false;
                 $file->save();
 
-                $key = $this->prefix.'Course_'.$request->course_number;  
+                $key = $this->prefix.'AllCourses';  
                 Cache::forget($key);                // forget this key (course_number)
 
                 session()->flash('messageAlertType','alert-info');
@@ -126,7 +127,7 @@ class AttachmentController extends Controller
                 $file->disabled = true;
                 $file->save();
 
-                $key = $this->prefix.'Course_'.$request->course_number;  
+                $key = $this->prefix.'AllCourses'; 
                 Cache::forget($key);                // forget this key (course_number)
 
                 session()->flash('messageAlertType','alert-warning');

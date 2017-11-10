@@ -28,6 +28,7 @@ class CourseStoreUpdate extends FormRequest
             //'number' => 'required|integer|between:100,999|unique:courses',
             'number' => 'sometimes|size:3|required|unique:courses',        // when edit-update, $request->number not exist
             'title' => 'required|max:50',
+            'sub_title' => 'sometimes|max:100',
             'abstract' => 'required|min:20',
             'level_id' => 'required|integer',
             'active' => 'sometimes',

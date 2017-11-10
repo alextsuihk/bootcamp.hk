@@ -19,20 +19,22 @@ class ComposerServiceProvider extends ServiceProvider
     public function boot()
     {
         View::composer('partials.sidebar', function ($view) {      // View Composer feature
-            $myQuestions = Question::getMyQuestions();
-            $openQuestions = Question::getOpenQuestions();
-            $newQuestions = Question::getnewQuestions();
-            $myNewComments = Comment::getMyNewComments();
-            $myCurrentLessons = Lesson::getMyCurrentLessons();
-            $myFutureLessons = Lesson::getMyFutureLessons();
-            $newLessons = Lesson::getNewLessons();
-            $allLessons = Lesson::getAllLessons();
-            $newUsers = User::getNewUsers();
+            $myQuestions = Question::getMyQuestionCount();
+            $openQuestions = Question::getOpenQuestionCount();
+            $newQuestions = Question::getNewQuestionCount();
+            $myNewComments = Comment::getMyNewCommentCount();
+            $myPastLessons = Lesson::getMyPastLessonCount();
+            $myCurrentLessons = Lesson::getMyCurrentLessonCount();
+            $myFutureLessons = Lesson::getMyFutureLessonCount();
+            $newLessons = Lesson::getNewLessonCount();
+            $allLessons = Lesson::getAllLessonCount();
+            $newUsers = User::getNewUserCount();
             
 
             $view->with('myQuestions', $myQuestions)
             ->with('openQuestions', $openQuestions)
             ->with('myNewComments', $myNewComments)
+            ->with('myPastLessons', $myPastLessons)
             ->with('myCurrentLessons', $myCurrentLessons)
             ->with('myFutureLessons', $myFutureLessons)
             ->with('newLessons', $newLessons)

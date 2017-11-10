@@ -12,9 +12,10 @@ class Level extends Model
      *
      * @return object
      */
-    public static function getAllLevel()
+    public static function getAllLevels()
     {
-        $levels = Cache::remember('LevelAll', 60, function() {
+        $key = config('cache.prefix').'AllLevels';
+        $levels = Cache::remember($key, 60, function() {
             return static::all()->sortBy('id');
         });
 

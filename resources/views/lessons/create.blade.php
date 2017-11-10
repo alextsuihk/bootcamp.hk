@@ -25,7 +25,10 @@
 
     <hr>
     <h2 id="lessonOffering">Lesson Offerings</h2>                    
-    @include ('lessons.list')
+    @include ('lessons.list', [
+    'showCourseTitle' => true,
+    ])
+
     
     <hr>
     <h2 id="lessonSection">Adding a Lesson</h2>

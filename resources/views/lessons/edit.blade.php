@@ -24,7 +24,10 @@
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
                             
-    @include ('lessons.list')
+    @include ('lessons.list', [
+        'showCourseTitle' => true,
+        ])
+
     
     <hr>
     <?php $edit = $edit_lesson; ?>

@@ -1,8 +1,8 @@
 {!! strip_tags($header) !!}
 
 {!! strip_tags($slot) !!}
-@isset($subcopy)
 
+@isset($subcopy)
 {!! strip_tags($subcopy) !!}
 @endisset
 

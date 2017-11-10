@@ -43,6 +43,7 @@
         <div class="row">
             <span class="mr-auto ml-3"><h2>Course Detail</h2></span>
             <span class="ml-auto mr-5">
+                <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}" title="To receive update">Follow</a>
                 @if (Helper::admin())
                     <a class="" data-toggle="tooltip" data-placement="top" title="Edit" 
                     href="{{ route('courses.edit', $course->number) }}">
@@ -67,11 +68,12 @@
             <span class="mr-auto ml-3">
                 <h2 id="lessonList">File Attachment for downloads</h2>
             </span>
-            @if (Helper::admin())
-                <span class="ml-auto mr-5">
+            <span class="ml-auto mr-5">
+                <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}" title="To receive update">Follow</a>
+                @if (Helper::admin())
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadNew">Add New File</button>
-                </span>
-            @endif
+                @endif
+            </span>
         </div>
         <hr>
         @include ('attachments.list')
@@ -82,24 +84,34 @@
             <span class="mr-auto ml-3">
                 <h2 id="lessonList">Class Offerings</h2>
             </span>
-            @if (Helper::admin())
-                <span class="ml-auto mr-5">
+            <span class="ml-auto mr-5">
+                <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}" title="To receive update">Follow</a>
+                @if (Helper::admin())
                     <a class="btn btn-primary" href="{{ route('lessons.create', $course->id) }}">Add Lesson</a>
                     {{-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".modal-lesson" data-title="New Lesson" data-action="my-Action" data-method="my-Method">Add New Lesson</button> --}}
                     {{-- will migrate to modal later --}}
-                </span>
-            @endif
+                @endif
+            </span>
         </div>
         <hr>
-        @include ('lessons.list')
-        {{-- @include ('lessons.modal')
-        AT-Pending: modal does not make sense, difficult to use helper:old() --}}
+        @if (!($course->active) && !Helper::admin())
+            <div class="jumbotron">
+                Course is not active, lesson information will NOT be shown<br>
+                Please contact system administrator !
+            </div>
+        @else
+            @include ('lessons.list', [
+                'showCourseTitle' => false,
+            ])
+        @endif
+
     @elseif ($nav=='qna')
         <div class="row">
             <span class="mr-auto ml-3">
                 <h2 id="lessonList">Questions &amp; Answers</h2>
             </span>
             <span class="ml-auto mr-2">
+                <a class="btn btn-primary" href="{{ route('courses.follow', $course->id) }}" title="To receive update">Follow</a>
                 @if (Auth::id())
                     <button id="askQuestionModal" type="button" class="btn btn-primary" data-toggle="modal" data-target="#askQuestion" data-course_id="{{ $course->id }}">Ask Question</button><br>
                 @else

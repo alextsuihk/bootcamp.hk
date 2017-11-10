@@ -15,16 +15,20 @@ class EnrollLesson extends Mailable implements ShouldQueue
 
     protected $user;
     protected $lesson;
+    protected $waitlisted;
+    protected $sequence;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user, Lesson $lesson)
+    public function __construct(User $user, Lesson $lesson, $waitlisted, $sequence)
     {
         $this->user = $user;
         $this->lesson = $lesson;
+        $this->waitlisted = $waitlisted;
+        $this->sequence = $sequence;
     }
 
     /**
@@ -40,7 +44,8 @@ class EnrollLesson extends Mailable implements ShouldQueue
 
         return $this->subject('Enrollment Confirmation')
             ->markdown('emails.enroll_lession', 
-            ['user' => $this->user, 'lesson' => $this->lesson,
+            ['user' => $this->user, 'lesson' => $this->lesson, 
+            'sequence' => $this->sequence, 'waitlisted' => $this->waitlisted, 
              'number' => $lesson_number, 'url' => $url]
         );
     }

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Course extends Model
 {
@@ -51,25 +52,29 @@ class Course extends Model
     }
 
     /**
-     * query scope for searching multiple keyword(s)
+     * course has been followed by many users (pivot table course_user_follow)
      *
      * @return mixed
      */
-    public function scopeCourseSearchByKeywords($query, $keywords)
+    public function follow_users()
     {
-        if ($keywords != '') 
-        {
-            // convert keywords from string to array. delimiter either " " or ","
-            $keywords = preg_split( '/[,\s]+/', $keywords);
-
-            $query->where(function ($query) use ($keywords) {
-                foreach ($keywords as $keyword) 
-                {
-                    $query->orwhere("title", "LIKE","%$keyword%")
-                        ->orWhere("abstract", "LIKE", "%$keyword%");
-                }
-            });
-        }
-        return $query;
+        return $this->belongsToMany(User::class, 'course_user_follow');
     }
+
+    /**
+     * Get All Course detail 
+     *
+     * @return mixed
+     */
+    public static function getAllCourses()
+    {
+        $key = config('cache.prefix').'AllCourses';
+        $courses = Cache::remember($key, 5, function() {
+            return Course::with(['level', 'follow_users', 'attachments', 'attachments.attachment_revisions'])
+            ->with(['attachments.attachment_revisions'])->orderBy('number')->get();
+            });                                 // enable eager loading + cache
+
+        return $courses;
+    }
+
 }

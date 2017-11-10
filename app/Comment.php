@@ -43,9 +43,9 @@ class Comment extends Model
      *
      * @return mixed
      */
-    public static function getMyNewComments()
+    public static function getMyNewCommentCount_to_be_removed()
     {
-        $key = 'user_'.Auth::id().'_myNewComments';  
+        $key = config('cache.prefix').'user_'.Auth::id().'_myNewCommentCount';  
         $myNewComments = Cache::remember($key, 5, function() {
             return static::with(['question' => function ($query) {
                 $query->where('user_id', Auth::id() );
@@ -54,6 +54,30 @@ class Comment extends Model
 
         return $myNewComments;
     }
+    public static function getMyNewCommentCount()
+    {
+        if (Auth::check())
+        {
+            $now = date('Y-m-d');
+            $count = Question::getAllQuestions()->where('blacklisted', false)->where('user_id', Auth::id())
+                ->filter( function ($value ,$key) {
+                    $matched = false;
+                    foreach ($value->comments as $comment)
+                    {
+                        if ($comment->viewed == false)
+                        {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                    return $matched;
+                })->count();
+        } else { 
+            $count = 0;
+        }
+        return $count;
+    }
+
 
     /**
      * Get # of New (unread) comments associated to questions user has posted

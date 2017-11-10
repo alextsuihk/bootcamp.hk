@@ -22,16 +22,30 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->filled('keywords')           // query-string has "keywords"
-            && !is_null($keywords = $request->input('keywords'))) { // get query string
-            $courses = User::with('language')->UserSearchByKeywords($keywords)->get();
+        $users = User::getAllUsers()->sortByDesc('created_at');
 
+        if ($request->filled('keywords')) {          // query-string has "keywords"
+            // convert keywords from string to array. delimiter either " " or ","
+            $keywords = $request->keywords;
+            $search = preg_split( '/[,\s]+/', $request->keywords);
+
+            $users = $users->filter(function ($value, $key) use ($search) {
+                $matched = false;
+                foreach ($search as $keyword) 
+                {
+                    if (stripos($value->name, $keyword) !== FALSE || stripos($value->nickname, $keyword) !==false 
+                        || stripos($value->email, $keyword) !== false)
+                    {   
+                        $matched = true;
+                        break;
+                    }
+                }
+                return $matched;
+            });
         } else {
-            User::with('language')->get();
             $keywords = 'Search... ';                  // index & search use the same view
         }
 
-        $users = User::all()->sortByDesc('created_at');
 
         return view('admin.users.index', compact(['users', 'keywords']));
     }

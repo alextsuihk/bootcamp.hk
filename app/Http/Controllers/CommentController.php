@@ -42,7 +42,7 @@ class CommentController extends Controller
         $key = $this->prefix.'AllQuestions';
         Cache::forget($key);
 
-        $key = 'user_'.$question->user_id.'_myNewComments';
+        $key = $this->prefix.'user_'.$question->user_id.'_myNewCommentCount';
         Cache::forget($key);
 
         session()->flash('messageAlertType','alert-success');

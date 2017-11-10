@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Helper;
+use Carbon\Carbon;
 use App\Question;
 use App\Comment;
 
@@ -26,7 +27,7 @@ class QuestionController extends Controller
      */
     public function index(Request $request, $nav='allQuestions')
     {
-        $questions = Question::getEverything();
+        $questions = Question::getAllQuestions();
 
         $title = 'Top Questions';
 
@@ -40,6 +41,10 @@ class QuestionController extends Controller
                     { return $value; }
             });
             $title = 'New Comments for My Questions';
+
+        } elseif ($nav == 'newQuestions') {
+            $questions = $questions->where('created_at', '>', Carbon::now()->subDays(14));
+            $title = 'New Questions';
 
         } elseif ($nav == 'unanswered') {
             $questions = $questions->filter(function ($value, $key) {
@@ -142,7 +147,7 @@ class QuestionController extends Controller
      */
     public function show($id, $slug = null)
     {
-        $questions = Question::getEverything();
+        $questions = Question::getAllQuestions();
 
         if (Helper::admin()) {
             $question = $questions->where('id', $id)->first();

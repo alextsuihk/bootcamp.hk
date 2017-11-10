@@ -1,23 +1,18 @@
-@if (count($lessons) == 0)
+@if (!($course->active) && !Helper::admin())
     <div class="jumbotron">
-        No Class at the moment
+        Course is not active, lesson information will NOT be shown<br>
+        Please contact system administrator !
+    </div>
+@elseif (count($lessons) == 0)
+    <div class="jumbotron">
+        No Class Offering at the moment
     </div>
 @else   
-
-    <div>
-        Sort By:
-        <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=course.title' }}">Title</a>
-        <a class="btn btn-secondary" href="{{ url()->current().'?sortBy=first_day' }}">First Day</a>
-    </div>
-
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th><center>No.</center></th>
-                    @if ($showCourseTitle)
-                        <th>Title</th>
-                    @endif
                     <th><center>Venue</center></th>
                     <th><center>Host</center></th>
                     <th><center>Language</center></th>
@@ -29,10 +24,10 @@
             </thead>
             <tbody>
                 @foreach ($lessons as $lesson)
-                     <?php $uri = route('courses.show', [$lesson->course->number, str_slug($lesson->course->title)]); ?>
 
                     <?php $hideButton = true; ?>
                     <?php $today=date("Y-m-d")  ;?>
+
                     @if (!($lesson->active))
                         <?php $status='<span style="color:red" title="Enrollment is closed">Inactive</span>'; ?>
                     @elseif ($lesson->first_day == null || $lesson->last_day == null)
@@ -65,26 +60,23 @@
                     @endif
 
                     <tr>
-                        <td><a class="" href="{{ $uri }}/overview">{{ $lesson->course->number }}</a>-{{ sprintf('%02d', $lesson->sequence) }}</td>
-                        @if ($showCourseTitle)
-                            <td><a class="" href="{{ $uri }}/overview">{{ $lesson->course->title }}</a></td>
-                        @endif
-                        <td>
+                        <td><center>{{ $lesson->course->number }}-{{ sprintf('%02d', $lesson->sequence) }}</center></td>
+                        <td><center>
                             @if ($lesson->venue)
                                 <span data-toggle="tooltip" data-placement="top" title="{{ $lesson->venue }}">
                                 {{ str_limit($lesson->venue, 50, ' ...') }}</span>
                             @else
                                 (TBD)
                             @endif
-                        </td>
-                        <td>
+                        </center></td>
+                        <td><center>
                             @if ($lesson->instructor)
                                 {{ $lesson->instructor }}
                             @else
                                 (TBD)
                             @endif
-                        </td>
-                        <td>{{ $lesson->teaching_language->language }}</td>
+                        </center></td>
+                        <td><center>{{ $lesson->teaching_language->language }}</center></td>
                         <td><center>
                             @if ($lesson->first_day)
                                 Start: {{ $lesson->first_day }} <br>
@@ -122,4 +114,4 @@
         </table>
     </div>
 
-@endempty {{-- @empty($lesson) --}}
+@endempty {{-- @empty($courses) --}}

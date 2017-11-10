@@ -47,6 +47,10 @@
                     <?php $active = ($nav=="unanswered")?"active":"";?>
                     <a class="nav-link {{ $active }}" href="{{ $uri }}/unanswered">Unanwersed Questions</a>
                 </li>
+                <li class="nav-item">
+                    <?php $active = ($nav=="newQuestions")?"active":"";?>
+                    <a class="nav-link {{ $active }}" href="{{ $uri }}/newQuestions">New Questions</a>
+                </li>
                 @if (Helper::admin())
                     <li class="nav-item">
                         <?php $active = ($nav=="openQuestions")?"active":"";?>

@@ -33,6 +33,20 @@
         @endif
     </div>
 
+    <div class="form-group">
+        <label class="col-form-label form-label" for="title">Sub-Title:</label>
+        <input type="text" class="form-control" id="sub_title" name="sub_title" 
+        value="{{ Helper::old('sub_title', $edit) }}" required {{ $disabled }}>
+        @if ($type != 'show')
+            @if ($errors->has('sub_title'))
+                <div class="form-error">
+                    <strong>{{ $errors->first('sub_title') }}</strong>
+                </div>
+            @endif
+            <span class="form-help">Sub-Title could be used in search</span>
+        @endif
+    </div>
+
     @if ($type == 'show')
         <div class="form-group">
             <label class="col-form-label form-label" for="title">Level of Difficulty:</label>

@@ -57,7 +57,7 @@ class Question extends Model
      *
      * @return mixed
      */
-    public static function getEverything()
+    public static function getAllQuestions()
     {
         $key = config('cache.prefix').'AllQuestions';
         $questions = Cache::remember($key, 5, function() {
@@ -72,9 +72,9 @@ class Question extends Model
      *
      * @return mixed
      */
-    public static function getMyQuestions()
+    public static function getMyQuestionCount()
     { 
-        $count =  self::getEverything()->where('user_id', Auth::id())->count();
+        $count =  static::getAllQuestions()->where('user_id', Auth::id())->count();
         return $count;
     }
 
@@ -83,9 +83,9 @@ class Question extends Model
      *
      * @return mixed
      */
-    public static function getOpenQuestions()
+    public static function getOpenQuestionCount()
     { 
-        $count =  self::getEverything()->where('closed', false)->count();
+        $count =  static::getAllQuestions()->where('closed', false)->count();
         return $count;
     }
 
@@ -94,9 +94,9 @@ class Question extends Model
      *
      * @return mixed
      */
-    public static function getNewQuestions()
+    public static function getNewQuestionCount()
     { 
-        $count =  self::getEverything()->where('created_at', '>', Carbon::now()->subDays(14) )->count();
+        $count =  static::getAllQuestions()->where('created_at', '>', Carbon::now()->subDays(14) )->count();
         return $count;
     }
 

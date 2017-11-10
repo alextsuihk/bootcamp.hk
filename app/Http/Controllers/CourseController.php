@@ -9,11 +9,12 @@ use App\Course;
 use App\Level;
 use App\Lesson;
 use App\Question;
-
+use Auth;       //AT-Pending; debugging
 class CourseController extends Controller
 {
     public function __construct()
     {
+        $this->middleware('auth')->only(['like', 'follow']);
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update']);
         $this->prefix = config('cache.prefix');
     }
@@ -25,21 +26,31 @@ class CourseController extends Controller
      */
     public function index(Request $request)
     {
+        $courses = Course::getAllCourses();
+
         if ($request->filled('keywords')) {          // query-string has "keywords"
+            // convert keywords from string to array. delimiter either " " or ","
             $keywords = $request->keywords;
-            $courses = Course::with('level')->CourseSearchByKeywords($keywords)->get();
+            $search = preg_split( '/[,\s]+/', $request->keywords);
+
+            $courses = $courses->filter(function ($value, $key) use ($search) {
+                $matched = false;
+                foreach ($search as $keyword) 
+                {
+                    if (stripos($value->title, $keyword) !== FALSE || stripos($value->sub_title, $keyword) !==false 
+                        || stripos($value->abstract, $keyword) !== false)
+                    {   
+                        $matched = true;
+                        break;
+                    }
+                }
+                return $matched;
+            });
 
         } else {
-                                     // only caching for read-only (index & show)
-            $key = $this->prefix.'AllCourses';
-            $courses = Cache::remember($key, 5, function() {
-                return Course::with('level')->get();
-            });                     // turn on eager loading
-
             $keywords = 'Search... ';                  // index & search use the same view
         }
 
-        $courses = $courses->sortBy('number');
         return view('courses.index', compact(['courses', 'keywords']));
     }
 
@@ -50,7 +61,7 @@ class CourseController extends Controller
      */
     public function create()
     {
-        $levels = Level::getAllLevel();
+        $levels = Level::getAllLevels();
         return view('courses.create', compact(['levels']));
     }
 
@@ -75,6 +86,7 @@ class CourseController extends Controller
         $course = Course::create([ 
             'number' => $number,
             'title' => $request->title,
+            'sub_title' => $request->sub_title,
             'abstract' => $request->abstract,
             'level_id' => $request->level_id,
             'active' => ($request->active ? true : false ),
@@ -96,20 +108,10 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($number, $slug = null, $nav='overview')
+    public function show(Request $request, $number, $slug = null, $nav='overview')
     {
-        // only cache & eager loading Course & Lession
-        // user enrollment will be using lazy loading
-        $key = $this->prefix.'Course_'.$number;         
-        $course = Cache::remember($key, 5, function() use ($number) {
-            return Course::with(['level','lessons', 'lessons.teaching_language', 'lessons.users', 'attachments'])
-            ->with(['attachments.attachment_revisions' => function ($query) { 
-                    $query->orderBy('id', 'desc');      // I want to sortByDesc attachment_revisions.id
-                }])
-            ->where('number', '=', $number)->where('deleted', false)->first();
-        });                                 // enable eager loading + cache
+        $course = Course::getAllCourses()->where('number', $number)->first();
 
-        //dd($course);                      // Alex: to check super nested eager loading result
         if (empty($course))
         {
             session()->flash('messageAlertType','alert-warning');
@@ -126,15 +128,28 @@ class CourseController extends Controller
             return redirect($url); 
         }
 
-        $lessons = $course->lessons->sortbyDesc('first_day');       // sortBy first_day DESC
+        $lessons = Lesson::getAllLessons()->where('course_id', $course->id);
+        if ($request->filled('sortBy'))
+        {
+            if ($request->sortOrder == 'desc')
+            {
+                $lessons = $lessons->sortByDesc($request->sortBy);
+            } else {
+                $lessons = $lessons->sortBy($request->sortBy);
+            }
+
+        } else {
+            $lessons = $lessons->sortByDesc('first_day');
+        }
+
+
         $attachments = $course->attachments;
 
         // get questions list 
-        $questions = Question::getEverything()->where('course_id', $course->id);
+        $questions = Question::getAllQuestions()->where('course_id', $course->id);
         $questions = Question::getLastModifiedAt($questions);
         $questions = $questions->sortByDesc('last_modified_at');
 
-        $tab = 'overview';
         return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav', 'questions']));
     }
     /**
@@ -165,6 +180,7 @@ class CourseController extends Controller
         
         /*$course->number = $request->number;*/         // unchangeable
         $course->title = $request->title;
+        $course->sub_title = $request->sub_title;
         $course->abstract = $request->abstract;
         $course->level_id = $request->level_id;
         $course->active = ($request->active ? true : false );
@@ -172,9 +188,6 @@ class CourseController extends Controller
         $course->remark =  $request->remark;
 
         $course->save();
-
-        $key = $this->prefix.'Course_'.$course->number;  
-        Cache::forget($key);                // forget this key (course_number)
 
         $key = $this->prefix.'AllCourses';
         Cache::forget($key);        // flush 'courses' cache (no need to wait to expire)
@@ -199,15 +212,48 @@ class CourseController extends Controller
     }
 
     /**
-     * TBD
+     * Follow this course if there is any update.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function follow($id)
+    public function follow($course_id)
     {
-        session()->flash('messageAlertType','alert-warning');
-        session()->flash('message','Feature is not yet implemented, please try later');
+
+        $user = Auth::user();
+        $followed = $user->courses()->where('id', $course_id)->exists();
+
+dd('under development');
+        if ($enrolled)
+        {
+            session()->flash('messageAlertType','alert-warning');
+            session()->flash('message','You have enrolled previously. See you in the class');
+            // if requesting to enroll & not yet enrolled
+
+        } else {
+
+            $enrolled_count = $lesson->users->count();
+            if ($lesson->quota == 0 || $enrolled_count < $lesson->quota)
+            {
+                $lesson->users()->attach(Auth::id(), ['enrolled_at' => now(), 'sequence' => $enrolled_count+1]);
+            } else {
+                $lesson->users()->attach(Auth::id(), ['waitlisted_at' => now(), 'sequence' => $enrolled_count+1]);
+            }
+            
+            $user = Auth::user();
+            $sequence = $enrolled_count+1 . '/'. $lesson->quota;
+            $message = (new EnrollLesson( $user, $lesson, $sequence));
+
+            Mail::to($user->email)->bcc('admin@bootcamp.hk')->send($message);
+
+            session()->flash('messageAlertType','alert-success');
+            session()->flash('message','We will send you updates');
+        } 
+
+// to_be_removed
+/*        $key = config('cache.prefix').'User_'.Auth::id();          // for sidebar My Shortcut
+        Cache::forget($key);*/
+
         return redirect()->back();
     }
+
 }
