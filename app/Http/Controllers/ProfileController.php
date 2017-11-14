@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Vinkla\GitLab\Facades\GitLab;
 use App\Helpers\Helper;
 use App\User;
 use App\Mail\VerifyEmail;
@@ -16,7 +19,7 @@ class ProfileController extends Controller
     public function __construct($id = 0 )
     {
         //$this->middleware('admin')->only(['show']);
-        $this->middleware('auth')->only(['sendemailverify', 'edit', 'update']);
+        $this->middleware('auth')->only(['sendemailverify', 'edit', 'update', 'createGitLabAccount']);
         $this->middleware('impersonate');
         $this->prefix = config('cache.prefix');
     }
@@ -64,12 +67,26 @@ class ProfileController extends Controller
      */
     public function emailverify($token)
     {
+        if (Auth::check() && Auth::user()->email_verified == true)
+        {
+            session()->flash('messageAlertType','alert-success');
+            session()->flash('message','The email address has been verified');
+            return redirect()->route('courses.index');
+        }
+
         $user = User::where('email_token', '=', $token)->first();
 
         if (count($user) ==0)
         {
             return view('profile.email_verify_fail', ['result' => 'nomatch']);
         } 
+
+        if ($user->email_verified == true)
+        {
+            session()->flash('messageAlertType','alert-success');
+            session()->flash('message','The email address has been verified');
+            return redirect()->route('courses.index');
+        }
 
         $expireInMinutes = config('mail.email_verify_expire');
 
@@ -85,7 +102,7 @@ class ProfileController extends Controller
             return redirect('/');
         } else {
             $user->email_verified = true;
-            $user->email_token = null;
+            //$user->email_token = null;
             $user->email_token_created_at = date('Y-m-d H:i:s');
             $user->save();
             session()->flash('messageAlertType','alert-success');
@@ -115,22 +132,21 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id = 0)
+    public function update(Request $request)
     {
         $validatedData = $request->validate([
             'nickname' => 'required|max:20',
             'mobile'   => 'nullable|digits:8',
         ]);
 
-        $count = User::where('mobile', $validatedData['mobile'])->where('id', '!=', $id)->count();
+        $user = Auth::user();
+        $count = User::where('mobile', $validatedData['mobile'])->where('id', '!=', $user->id)->count();
         if ($count > 0)
         {
             return redirect()->back()
                         ->withErrors(['mobile' => 'The mobile phone is using used by another person'])
                         ->withInput();
         }
-
-        $user = Auth::user();
 
         $user->nickname = $validatedData['nickname'];
         $user->mobile = $validatedData['mobile'];
@@ -175,5 +191,72 @@ class ProfileController extends Controller
         session()->flash('message', $type.' is disassociated with your account');
         return redirect()->route('profile.edit');
     }
+
+
+    /**
+     * Check if Gitlab account exists
+     *
+     * @param  string
+     * @return \
+     */
+    public function checkGitlabAccount()
+    {
+        $projects = GitLab::api('projects')->all();
+        $users = collect(GitLab::api('users')->all());
+        $users = $users->where('id', 3);
+        dump($users);
+        dd($projects);
+    }
+
+
+    /**
+     * Create Gitlab account 
+     *
+     * @param  string
+     * @return \
+     */
+    public function gitLabAccount(Request $request)
+    {
+        $user = Auth::user();
+        if (strlen($user->password) ==0) 
+        {
+            session()->flash('messageAlertType','alert-warning');
+            session()->flash('message', 'You need to setup password first before creating GitLab Account');
+            return redirect()->route('password.edit');
+        }  
+
+        if (!Hash::check($request->password, $user->password))
+        {
+            session()->flash('messageAlertType','alert-danger');
+            session()->flash('message', 'The entered password does NOT match our record. <br>We CANNOT create GitLab account for you. <br><strong><span style="color:red;">Please re-try</span></strong>');
+            return redirect()->back();
+        } 
+
+        $gitUser = GitLab::api('users')->create($user->email, $request->password, [
+            'name' => $user->name,
+            'username' => $user->nickname?$user->nickname:$user->name,     // if nickname is null, use name instead
+            'avatar_url' => $user->avatar,
+            'lat_sign_in_at' => '2017-10-15',
+            'confirmed_at' => '2017-10-01T08:28:21.315Z',
+            'last_activity_on' => '2017-10-19',
+/*            'identities' => array(
+                ['provider' => 'linkedin', 'external_uid' => $user->linkedin_id],
+                ['provider' => 'facebook', 'external_uid' => $user->facebook_id],
+                ['provider' => 'bootcamp', 'external_uid' => $user->id],
+            ),*/
+        ]);
+        
+
+        $user->gitlab_id = $gitUser['id'];
+        $user->save();
+
+        session()->flash('messageAlertType','alert-success');
+        session()->flash('message', 'Your GitLab Account is created, you <strong>MUST</strong> check email & verify before logging in <a href="https://gitlab.bootcamp.hk">https://gitlab.bootcamp.hk</a>');
+        return redirect()->back();
+    }
+
+
+
+
 
 };

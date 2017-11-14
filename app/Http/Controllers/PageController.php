@@ -20,4 +20,9 @@ class PageController extends Controller
     {
         return view('pages.contactus');
     }
+
+    public function getSupport()
+    {
+        return view('pages.support');
+    }
 }

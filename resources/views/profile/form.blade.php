@@ -27,7 +27,7 @@
         @if (Auth::user()->email_verified)
             <span class="badge badge-success">verified</span>
         @else
-            <div><a class="btn btn-primary" href="{{ route('email.sendverify') }}">Resend Verification Email</a></div>
+            <span><a class="btn btn-primary" href="{{ route('email.sendverify') }}">Resend Verification Email</a></span>
         @endif
         </label>
         <input type="email" class="form-control col-md-6" id="email" name="email" 
@@ -36,6 +36,24 @@
         value="{{ Helper::old('email', $user) }}"  disabled}>
  --}}        
         <span class="form-help">If you wish to change email, pls send email to {{ config('mail.admin_email') }}</span>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-5 control-label form-label">GitLab:
+        @if (Auth::user()->email_verified)
+            @if (Auth::user()->gitlab_id == null)
+                <button id="gitLabAccountModal" type="button" class="btn btn-primary" data-toggle="modal" data-target="#gitLabAccount" data-type="createGitLabAccount">Create</button>
+            @else
+                <span class="badge badge-success">GitLab account created</span>
+                    <a href="https://gitlab.bootcamp.hk" target="_blank">https://gitlab.bootcamp.hk</a>
+{{--                 <span><a class="btn btn-primary" title="Sync profile to GitLab "
+                    href="#">Sync</a></span> --}}
+            @endif 
+        @else
+            <span><button class="btn btn-primary", title="You need to verify email first" disabled>
+                Create</button></span>
+        @endif
+        </label>
     </div>
 
     <div class="form-group">

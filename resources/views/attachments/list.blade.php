@@ -30,7 +30,7 @@
                             
                             <td>
                                 <select class="form-control custom-select" id="revision_id" name="revision_id">
-                                    <option selected value="{{ $attachment->attachment_revisions->first()->id }}">Latest</option>
+                                    <option selected value="{{ $attachment->attachment_revisions->last()->id }}">Latest</option>
                                     @foreach ($attachment->attachment_revisions as $revision)
                                         <?php $disabled = ($revision->disabled)?"[disabled]":""; ?>
                                         <option value="{{ $revision->id }}">

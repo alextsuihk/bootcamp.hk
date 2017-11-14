@@ -18,8 +18,8 @@
 Route::get('contactus', 'PageController@getContactUs');*/
 //AT-Pending: go ahead & remove PageController
 Route::view('aboutus', 'pages/aboutus');
-Route::view('contactus', 'pages/contactus');
-Route::view('support', 'pages/support');
+Route::view('contactus', 'pages/aboutus');
+Route::view('support', 'pages/aboutus');
 /**
  * Courses Controller
  */
@@ -68,9 +68,10 @@ Route::get('comment_vote/{id}/{action}', 'CommentController@vote')->name('commen
 /**
  * User Profile
  */
-Route::get('profile/sendemailverify', 'ProfileController@sendemailverify')->name('email.sendverify'); 
-Route::get('profile/{id?}', 'ProfileController@edit')->name('profile.edit'); 
-Route::post('profile/{id?}', 'ProfileController@update')->name('profile.update');
+Route::get('profile', 'ProfileController@edit')->name('profile.edit'); 
+Route::post('profile', 'ProfileController@update')->name('profile.update');
+Route::post('gitlab', 'ProfileController@gitLabAccount')->name('profile.gitLabAccount');
+Route::get('sendemailverify', 'ProfileController@sendemailverify')->name('email.sendverify'); 
 Route::get('email/verify/{token}', 'ProfileController@emailverify')->name('email.verify');
 Route::get('password/change', 'Auth\ChangePasswordController@edit')->name('password.edit');
 Route::post('password/change', 'Auth\ChangePasswordController@update')->name('password.update');

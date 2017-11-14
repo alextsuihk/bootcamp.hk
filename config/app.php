@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
+        Vinkla\GitLab\GitLabServiceProvider::class,
     ],
 
     /*
@@ -229,7 +230,7 @@ return [
         'Helper' => App\Helpers\Helper::class,                  // custom helper
         'Debugbar' => Barryvdh\Debugbar\Facade::class,          // Laravel Debugbar
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,  // OAuth2 (login with Facebook)
-
+        'GitLab' => Vinkla\GitLab\Facades\GitLab::class,        // GitLab API
     ],
 
 ];

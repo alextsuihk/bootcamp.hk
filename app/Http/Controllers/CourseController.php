@@ -182,6 +182,17 @@ class CourseController extends Controller
             $follow = 'Follow';
         }
 
+        $gitLabUrl = 'https://gitlab.bootcamp.hk/courses/'.$course->number;
+        $array = get_headers($gitLabUrl);
+        $string = $array[0];
+        if(strpos($string,"200"))
+        {
+            $course->gitLabUrl = $gitLabUrl;
+        } else {
+            $course->gitLabUrl = '';
+        }
+
+
         return view('courses.show', compact(['course', 'lessons', 'attachments', 'nav', 'questions', 'follow']));
     }
     /**

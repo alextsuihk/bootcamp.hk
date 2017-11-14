@@ -47,12 +47,21 @@
         @endif
     </div>
 
+    @if ($type == 'show' && $edit->gitLabUrl)
+        <div class="form-group">
+            <label class="col-form-label form-label" for="title">Gitlab URL Link (for accessing codes):</label>
+            <div class="form-control mceNonEditable" style="background-color: #e9ecef;">
+                <a href="{!! $course->gitLabUrl !!}" target="_blank">{!! $course->gitLabUrl !!}</a></div>
+        </div>
+    @endif
+
     @if ($type == 'show')
         <div class="form-group">
             <label class="col-form-label form-label" for="title">Level of Difficulty:</label>
             <input type="text" class="form-control" value="{{ $edit->level->difficulty }}" {{ $disabled }}>
 
         </div>
+
         <div class="form-group">
             <label class="col-form-label form-label" for="abstract">Abstract:</label>
             <div class="form-control mceNonEditable" style="background-color: #e9ecef;">
@@ -89,23 +98,23 @@
         </div>
     @endif
 
-    <div class="form-group">
-        <div class="checkbox-inline">
-            <label>
-                <input type="checkbox" name="active" {{ Helper::old('active', $edit) ? 'checked' : '' }} 
-                {{ $disabled }}> Active for user viewing </label>
-                @if ($type != 'show')
-                    @if ($errors->has('active'))
-                        <div class="form-error">
-                            <strong>{{ $errors->first('active') }}</strong>
-                        </div>
+    @if (Helper::admin())
+        <div class="form-group">
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" name="active" {{ Helper::old('active', $edit) ? 'checked' : '' }} 
+                    {{ $disabled }}> Active for user viewing </label>
+                    @if ($type != 'show')
+                        @if ($errors->has('active'))
+                            <div class="form-error">
+                                <strong>{{ $errors->first('active') }}</strong>
+                            </div>
+                        @endif
+                        <div class="form-help">course will be visible to user</div>
                     @endif
-                    <div class="form-help">course will be visible to user</div>
-                @endif
+            </div>
         </div>
-    </div>
 
-    @if (Helper::admin()) 
         <div class="form-group">
             <label class="col-form-label form-label" for="remark">Remark (admin):</label>
             @if ($type == 'show')

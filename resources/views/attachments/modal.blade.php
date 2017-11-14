@@ -24,7 +24,6 @@
                         <label class="col-form-label form-label" for="filename">Filename:</label>
                         <input type="text" class="form-control" id="filename" name="filename">
                         <span class="form-help">(optional) if blank, will use the original filename</span>
-
                     </div>
 
                     <div class="form-group">

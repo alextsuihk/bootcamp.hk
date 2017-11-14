@@ -8,12 +8,13 @@
     @include ('profile.form', [
         'type'     => 'edit',
         'disabled' => '',           // don't disable form-input
-        'action'=> action('ProfileController@update', $user->id), 
+        'action'=> action('ProfileController@update'), 
         'method'=> "", 
         'button'=> 'Submit',
         ]) 
     {{-- need to use relative link to work, https vs http issue --}}
 
+    @include ('profile.modal')
 @endsection
 
 

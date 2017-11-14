@@ -76,6 +76,10 @@
                             <div class="dropdown-divider"></div>
                         @endif
                         <a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a>
+                        @if (Auth::user()->gitlab_id == null)
+                            <a class="dropdown-item" href=" {{route('profile.edit')}} ">
+                                Create GitLab Account</a>
+                        @endif
                         <a class="dropdown-item" href="{{ route('password.edit') }}">Change Password</a>
                         <div class="dropdown-divider"></div>  
                         <a class="dropdown-item" href="{{ route('logout') }}"
