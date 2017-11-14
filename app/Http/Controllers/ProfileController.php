@@ -140,12 +140,15 @@ class ProfileController extends Controller
         ]);
 
         $user = Auth::user();
-        $count = User::where('mobile', $validatedData['mobile'])->where('id', '!=', $user->id)->count();
-        if ($count > 0)
+        if ($validatedData['mobile']) 
         {
-            return redirect()->back()
-                        ->withErrors(['mobile' => 'The mobile phone is using used by another person'])
-                        ->withInput();
+            $count = User::where('mobile', $validatedData['mobile'])->where('id', '!=', $user->id)->count();
+            if ($count > 0)
+            {
+                return redirect()->back()
+                            ->withErrors(['mobile' => 'The mobile phone is using used by another person'])
+                            ->withInput();
+            }
         }
 
         $user->nickname = $validatedData['nickname'];
@@ -234,7 +237,8 @@ class ProfileController extends Controller
 
         $gitUser = GitLab::api('users')->create($user->email, $request->password, [
             'name' => $user->name,
-            'username' => $user->nickname?$user->nickname:$user->name,     // if nickname is null, use name instead
+            //'username' => $user->nickname?$user->nickname:$user->name,     // if nickname is null, use name instead
+            'username' => $user->name,          // Gitlab does not accept space in username when using API
             'avatar_url' => $user->avatar,
             'lat_sign_in_at' => '2017-10-15',
             'confirmed_at' => '2017-10-01T08:28:21.315Z',
